@@ -7,3 +7,6 @@ Offer 1: one buyer-provided public EVM transaction evidence memo, indicative 5 n
 Offer 2: up to five public EVM transfer receipts, deduplicated & reconciled, indicative 15 USDC, after fixed-scope buyer approval.
 Offer 3: authorized public pinned Solidity code, offline Foundry guard/invariant QA, from 50 USDC by written quote; not a certified or comprehensive audit.
 One human beneficial owner; AI-assisted work disclosed. No invented professional credentials or previous paid clients. No live exploits or third-party privacy-sensitive data. No wallet secrets, send, gas, investment, or unauthorized access. No payment earned merely by viewing this page.
+
+Direct inquiry: mailto:onecursor1@gmail.com?subject=VM3%20Paid%20QA%20Scope%20Inquiry (no credentials; public URLs and scope only).
+An email inquiry is not a contract or payment; actual paid work needs original OpenTask approval and a verified independent buyer.
