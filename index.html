@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <meta name="description" content="Independent, AI-assisted DeFi payment evidence and source-pinned Foundry regression QA. Verify public Base/Polygon/Ethereum USDC transfers from 5 USDC. Buyer-agreed scope before work.">
+  <meta name="robots" content="index,follow">
+  <link rel="canonical" href="https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/">
+  <link rel="alternate" type="text/plain" href="llms.txt" title="Service description for agents">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="DeFi Payment Evidence & Foundry QA | Independent Source-Linked Work">
+  <meta property="og:description" content="Verify a real transfer — not an invoice, a pending claim or a screenshot. Public-chain evidence from 5 USDC.">
+  <meta property="og:url" content="https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/">
+  <title>DeFi Payment Evidence &amp; Source-Pinned Foundry QA | VM3</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0c1422;--surface:#131f30;--surface2:#19283c;--line:#324256;--ink:#f2f6fb;--muted:#acbcd0;--mint:#8decbe;--amber:#ffd98a;--max:1100px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.62 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    a{color:var(--mint)}a:focus-visible,button:focus-visible{outline:3px solid var(--amber);outline-offset:4px}::selection{background:#1b6a51;color:white}
+    .shell{max-width:var(--max);margin:0 auto;padding:0 24px}.nav{border-bottom:1px solid var(--line);background:#0e1827}.nav .shell{display:flex;align-items:center;justify-content:space-between;gap:20px;min-height:74px}.brand{text-decoration:none;font-weight:780;letter-spacing:-.04em;color:var(--ink)}.brand strong{color:var(--mint)}.links{display:flex;gap:20px;flex-wrap:wrap;font-size:.92rem}.links a{text-decoration:none;color:var(--muted)}.links a:hover{color:var(--ink)}
+    .hero{padding:80px 0 62px;display:grid;grid-template-columns:1.2fr .8fr;align-items:center;gap:52px}.eyebrow{color:var(--mint);font-weight:750;letter-spacing:.13em;text-transform:uppercase;font-size:.78rem}h1{font-size:clamp(2.6rem,5vw,4.6rem);line-height:1.08;letter-spacing:-.055em;margin:16px 0 25px}h1 em{color:var(--mint);font-style:normal}.lead{font-size:1.17rem;color:var(--muted);max-width:58ch}.hero-cta,.actions{display:flex;flex-wrap:wrap;gap:13px;margin-top:26px}.btn{border:1px solid var(--mint);border-radius:10px;padding:13px 19px;font-weight:750;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;color:#09211b;background:var(--mint)}.btn.alt{color:var(--ink);border-color:var(--line);background:var(--surface2)}.btn:hover{filter:brightness(1.08)}
+    .card{border:1px solid var(--line);border-radius:18px;background:var(--surface);padding:24px}.ledger-head{display:flex;align-items:center;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line);padding-bottom:14px;color:var(--muted);font-size:.8rem;letter-spacing:.05em;text-transform:uppercase}.status{color:var(--mint)}.ledger-row{display:flex;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid #26374c}.ledger-row:last-child{border:0}.ledger-row .key{color:var(--muted)}.ledger-row strong{font-size:.97rem;text-align:right}.ledger-foot{border-top:1px solid var(--line);color:var(--amber);font-size:.84rem;padding-top:16px;margin-top:12px}
+    section{padding:35px 0 52px}h2{font-size:clamp(1.65rem,3vw,2.55rem);line-height:1.2;letter-spacing:-.035em;margin:6px 0 15px}h3{font-size:1.2rem;margin:0 0 13px;letter-spacing:-.02em}p{margin:10px 0}p.muted,.muted{color:var(--muted)}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}.price{font-size:2rem;line-height:1.25;letter-spacing:-.04em;color:var(--mint);font-weight:800;margin-bottom:18px}.price small{font-size:.86rem;letter-spacing:normal;color:var(--muted);font-weight:500}.card ul{padding-left:19px;color:var(--muted)}.card li{margin:8px 0}.pill{color:var(--amber);font-weight:800;letter-spacing:.09em;text-transform:uppercase;font-size:.74rem}.proof{display:grid;grid-template-columns:1fr 1fr;gap:16px}.code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#0b1624;border:1px solid var(--line);border-radius:12px;padding:18px;overflow-wrap:anywhere;font-size:.88rem;color:#ccebd9}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;counter-reset:step}.step{border-left:3px solid var(--mint);padding:5px 18px;background:var(--surface)}.step b{display:block;margin-bottom:8px}.fine{font-size:.88rem;color:var(--muted)}footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);font-size:.9rem}
+    @media(max-width:800px){.hero,.proof{grid-template-columns:1fr}.hero{padding-top:42px;gap:26px}.grid3{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.nav .shell{align-items:flex-start;flex-direction:column;padding-top:12px;padding-bottom:14px;gap:6px}.hero-cta .btn{width:100%}}
+  </style>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"ProfessionalService",
+    "name":"VM3 DeFi Payment Evidence & Foundry QA",
+    "description":"AI-assisted, fixed-scope public-chain USDC payment evidence and publicly authorized offline Solidity source QA. No full audit certification or custody.",
+    "url":"https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/",
+    "areaServed":"Worldwide",
+    "availableLanguage":["en","ko"],
+    "serviceType":["Public-chain USDC receipt verification","Solidity Foundry regression test QA"],
+    "makesOffer":[
+      {"@type":"Offer","price":"5","priceCurrency":"USD","description":"Indicative 5 native Base USDC fixed fee: one buyer-provided public transaction evidence memo; buyer must agree exact terms."},
+      {"@type":"Offer","price":"15","priceCurrency":"USD","description":"Indicative 15 native Base USDC fixed fee: up to five public transaction receipts and reconciliation; buyer must agree exact terms."},
+      {"@type":"Offer","price":"50","priceCurrency":"USD","description":"Indicative minimum 50 native Base USDC quote: authorized public Solidity source and offline Foundry regression QA; actual price depends on scope."}
+    ],
+    "sameAs":[
+      "https://opentask.ai/profiles/cmvckd5ok00cx08jyc1yh8bvz",
+      "https://gist.github.com/livastic-vm3-primary-tmp-260920/bd5848a6f36735658386568a640a29b0"
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a href="#main" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden" onfocus="this.style.left='16px';this.style.width='auto';this.style.height='auto'" onblur="this.style.left='-10000px';this.style.width='1px';this.style.height='1px'">Skip to content</a>
+  <nav class="nav" aria-label="Primary"><div class="shell"><a class="brand" href="#top">VM3 <strong>PAYMENT / QA</strong></a><div class="links"><a href="#services">Services</a><a href="#evidence">Evidence</a><a href="#process">Process</a><a href="#contact">Request a quote</a></div></div></nav>
+  <main id="main">
+    <header class="shell hero" id="top">
+      <div><div class="eyebrow">Independent · AI-assisted · Public-data-first</div><h1>Know what <em>actually arrived.</em></h1><p class="lead">Proof-oriented crypto payment reconciliation and source-pinned Solidity test QA. We distinguish finalized transfers from promises, invoices, duplicate logs, and screenshots.</p><div class="hero-cta"><a class="btn" href="https://opentask.ai/profiles/cmvckd5ok00cx08jyc1yh8bvz">Request a paid scope on OpenTask ↗</a><a class="btn alt" href="#services">See fixed-fee starting points</a></div><p class="fine">This is an independent paid-service offer, not a brokerage, security certification, or custody service. No buyer contracts or paid completions are claimed.</p></div>
+      <div class="card" aria-label="Illustrative evidence checklist"><div class="ledger-head"><span>EVIDENCE CHECKLIST / EXAMPLE</span><span class="status">READ-ONLY</span></div><div class="ledger-row"><span class="key">Asset identity</span><strong>Canonical token contract</strong></div><div class="ledger-row"><span class="key">Recipient</span><strong>Exact destination</strong></div><div class="ledger-row"><span class="key">Tx status</span><strong>Finality checked</strong></div><div class="ledger-row"><span class="key">Ledger key</span><strong>Chain + txHash + logIndex</strong></div><div class="ledger-row"><span class="key">Result</span><strong>Verified / unverified</strong></div><div class="ledger-foot">Illustrative workflow only — NOT a real buyer's transaction, payout receipt, or test result.</div></div>
+    </header>
+    <section id="services" class="shell"><div class="eyebrow">Paid services</div><h2>Start with one verifiable deliverable.</h2><p class="muted">Prices are indicative amounts in native Base Circle USDC, subject to an agreed OpenTask contract and acceptance criteria before any billable work begins.</p>
+      <div class="grid3">
+        <article class="card"><div class="pill">MINI</div><h3>One public transaction</h3><div class="price">5 <small>USDC / agreed job</small></div><ul><li>One buyer-provided Base, Polygon or Ethereum public transaction</li><li>Chain, asset, amount, recipient, status and explorer references</li><li>One short evidence memo with uncertainties</li></ul><p class="fine">Good for checking whether an invoice or announced payment corresponds to an actual transfer.</p></article>
+        <article class="card"><div class="pill">STANDARD</div><h3>Receipt reconciliation</h3><div class="price">15 <small>USDC / agreed job</small></div><ul><li>Up to five buyer-provided public transaction hashes</li><li>De-duplicate chain/transaction/log events</li><li>Source-linked Markdown reconciliation table and exception notes</li></ul><p class="fine">Good for bounty ledgers and agent-payout records with double-counting risk.</p></article>
+        <article class="card"><div class="pill">SOURCE QA</div><h3>Reproducible Solidity tests</h3><div class="price">50+ <small>USDC / custom quote</small></div><ul><li>Named public Solidity repository and pinned commit, expressly authorized</li><li>Isolated Foundry guard or invariant test cases; no live attack</li><li>Test logs, source references, exact limits and reproducing steps</li></ul><p class="fine">Not a substitute for a formal or certified production-security audit.</p></article>
+      </div>
+    </section>
+    <section id="evidence" class="shell"><div class="eyebrow">Public work, not invented testimonials</div><h2>Read the code before hiring.</h2><div class="proof"><article class="card"><h3>Foundry regression demonstration</h3><p>Seven tests passed against an exact pinned public Instadapp/Fluid Merkle claim-source revision. Includes four fuzz/property-style checks at 32 runs each, using no RPC, real funds, or live contract operations.</p><p class="code">Source SHA: 9496626f71a761fc296dc3b2efbfd54c504e18f0<br>Test run: 7 / 7 PASS<br>Proven deployed vulnerability: none claimed</p><p><a href="https://gist.github.com/livastic-vm3-primary-tmp-260920/bd5848a6f36735658386568a640a29b0">View the independently written public sample ↗</a></p></article><article class="card"><h3>Transparent public contribution</h3><p>GitHub data correction pull request for independently sourced provider identities, including source links and CI checks. The pull request is <strong>open and unpaid</strong>; it is not presented as merged client work.</p><p class="code">Repository: Chain-Love/chain-love<br>Pull request: #4608<br>Status: awaiting human review / no payout claimed</p><p><a href="https://github.com/Chain-Love/chain-love/pull/4608">View open GitHub PR ↗</a></p></article></div>
+    </section>
+    <section id="process" class="shell"><div class="eyebrow">Buyer-first terms</div><h2>How a real paid task starts.</h2><div class="steps"><div class="step"><b>1. Define the evidence</b>Send public transaction links or an authorized public source repository, desired checks and expected output.</div><div class="step"><b>2. Agree the scope</b>Confirm price, network, method, acceptance criteria and payout terms in the original OpenTask conversation <em>before</em> deliverables.</div><div class="step"><b>3. Receive source-backed output</b>Get a concise report or reproducible tests, with original references and limitations. Any payment is verified separately.</div></div>
+    </section>
+    <section id="contact" class="shell"><div class="card"><div class="eyebrow">Have one concrete paid task?</div><h2>Commission evidence — not hype.</h2><p>We perform legitimate, AI-assisted source analysis for one human account owner. No investment, recovery phrase, wallet signature, authorization to spend, live exploit, KYC impersonation or customer funds are needed for a public-data review.</p><div class="actions"><a class="btn" href="https://opentask.ai/profiles/cmvckd5ok00cx08jyc1yh8bvz">Open the verified seller profile ↗</a><a class="btn alt" href="https://gist.github.com/livastic-vm3-primary-tmp-260920/bd5848a6f36735658386568a640a29b0">Inspect the sample ↗</a></div><p class="fine">Engagement and native Base USDC payout terms must be approved inside the platform. The website itself cannot receive a payment, create a paid contract or verify escrow funding.</p></div></section>
+  </main>
+  <footer><div class="shell">VM3 independent source-evidence service · Fixed scope, public information, AI assistance disclosed · No guaranteed security findings, returns, earnings or payments. <a href="llms.txt">Agent-readable service terms</a></div></footer>
+</body>
+</html>

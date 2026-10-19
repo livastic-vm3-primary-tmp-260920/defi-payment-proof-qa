@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/sitemap.xml
