@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="index,follow">
+<meta name="description" content="Check YOUR CSV structural quality with a real Base USDC x402 paid API for 0.005 USDC. Free synthetic example, HTTP 402 preflight, correct JSON request, limits and transparent disclosures.">
+<link rel="canonical" href="https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/csv-structural-preflight-005-base-usdc.html">
+<title>CSV Preflight API for Agents | Check Your Own CSV for 0.005 USDC on Base</title>
+<style>
+:root{color-scheme:dark;--bg:#101827;--panel:#1a2636;--line:#36465c;--txt:#f1f5fc;--muted:#b4c2d3;--a:#a2ddec}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}main{max-width:950px;margin:auto;padding:24px 22px 80px}a{color:var(--a);text-underline-offset:3px}nav{padding:20px 22px;border-bottom:1px solid var(--line);max-width:950px;margin:auto}h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.12;margin:10px 0 22px}h2{font-size:1.45rem;margin:36px 0 14px}p,li{color:var(--muted)}strong{color:var(--txt)}.eyebrow{text-transform:uppercase;letter-spacing:.12em;color:var(--a);font-size:.82rem;font-weight:750}.card{background:var(--panel);padding:22px;border:1px solid var(--line);border-radius:12px}.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}.cost{font-size:2.3rem;line-height:1.2;font-weight:800;color:var(--txt)}.small{font-size:.88rem}.button{display:inline-block;border-radius:8px;padding:11px 15px;background:#a2ddec;color:#112934;text-decoration:none;font-weight:800}pre{white-space:pre;overflow-x:auto;font-size:.82rem;background:#0b1322;padding:16px;border-radius:8px;border:1px solid #334559;color:#d9ebf5}code{color:#d9ebf5}@media(max-width:660px){main{padding:20px 14px 60px}.cols{grid-template-columns:1fr}pre{font-size:.74rem}}
+</style>
+</head>
+<body>
+<nav><a href="../">VM3 Payment / QA</a> / CSV structural preflight</nav>
+<main>
+<p class="eyebrow">Live x402 software · original same-owner VM5 merchant · 20 Oct 2026</p>
+<h1>Find CSV structure problems before your agent imports the file.</h1>
+<p>When you have a CSV you are authorized to inspect, use a transparent machine-payable API to check row shape, duplicated entries, empty values, invalid-looking fields, and spreadsheet formula risks. A valid unpaid request returns standard HTTP 402 — <strong>0.005 native Circle USDC on Base per completed paid call</strong>. No customer data is ever needed to view the free demo.</p>
+<div class="cols">
+<div class="card"><div class="eyebrow">Buyer-owned input · real service</div><p class="cost">0.005 <span class="small">USDC / call</span></p><p><strong>POST /v1/csv-preflight</strong> checks the CSV you provide. Submit JSON <code>csvText</code> and optional <code>expectedColumns</code>. Invalid input can be rejected without payment. A buyer makes the x402 payment using their own authorized payment client.</p><p><a class="button" href="https://vm5-openapi-x402.onrender.com/openapi.json">Read canonical OpenAPI ↗</a></p></div>
+<div class="card"><div class="eyebrow">Free transparent example</div><p class="cost">Free <span class="small">example only</span></p><p><strong>GET /v1/csv-sample</strong> reveals a synthetic CSV with deliberately duplicated and irregular cells, the actual POST schema, price, network and safety limits. It does not count as a paid purchase or a real customer receipt.</p><p><a class="button" href="https://vm5-openapi-x402.onrender.com/v1/csv-sample">Open free synthetic sample ↗</a></p></div>
+</div>
+<h2>Runnable payment-handshake preflight</h2>
+<p>This exact example uses invented <code>.invalid</code> email addresses. It does not send a payment signature. If the request body is valid, the service returns HTTP <strong>402 Payment Required</strong>; the response includes the payment terms to be accepted by your own authorized x402 client. Running the command alone cannot buy the report.</p>
+<pre>curl -i --request POST \
+  'https://vm5-openapi-x402.onrender.com/v1/csv-preflight' \
+  --header 'Content-Type: application/json' \
+  --data '{"csvText":"email,amount,date,note\na@example.invalid,12.5,2026-10-20,paid\na@example.invalid,12.5,2026-10-20,paid\nb@example.invalid,not-a-number,2026-13-99,=1+1","expectedColumns":["email","amount","date","note"]}'</pre>
+<p>Fresh read-only smoke evidence on 20 October 2026: the example was accepted for payment negotiation (HTTP 402 with <code>PAYMENT-REQUIRED</code>), while an empty CSV was rejected HTTP 400 without a payment challenge. Those responses show billing is gated; neither proves a successful paid delivery.</p>
+<h2>Scope and operating limits</h2>
+<ul>
+<li>UTF-8 JSON body; CSV text at most <strong>32 KiB</strong>; at most <strong>500 data rows</strong> and <strong>40 columns</strong>.</li>
+<li>Optional expected column names can make missing or reordered fields easier to spot.</li>
+<li>Paid results report structure and issue locations rather than raw source rows. Infrastructure-level request logging may still apply; do not send passwords, wallet seeds or confidential customer records.</li>
+<li>The service flags patterns; it cannot certify database integrity, privacy-law compliance, merchant identity, or production data safety.</li>
+<li>Network: <code>eip155:8453</code>; asset: native Circle USDC on Base. Only the buyer's own wallet authorizes payment.</li>
+</ul>
+<h2>Know which endpoint is useful</h2>
+<p>The separate <a href="https://vm5-openapi-x402.onrender.com/v1/csv-report">GET /v1/csv-report</a> also costs 0.005 USDC but reports on a predefined synthetic example. To inspect <strong>your own actual CSV</strong>, use <strong>POST /v1/csv-preflight</strong> instead. Neither requires registration to view the unpaid 402 payment challenge.</p>
+<h2>Provenance, ownership and transparent limitations</h2>
+<p>This is an original, AI-assisted software service owned by one human beneficiary and hosted in the same owner's VM5 x402 merchant. This VM3 page is a sales and integration guide, not another merchant, not a second operator, and not a representation of third-party customer orders. A previously observed Circle USDC wallet receipt is not attributed to this specific POST endpoint without request-level proof. Refund and delivery terms are governed by the actual agreed provider payment flow.</p>
+<p class="small"><a href="../">Other original QA services</a> · <a href="x402-402-preflight.html">Why 402 responses are not sales</a> · <a href="qa-public-sample-20261020.html">Reproducible owner-operated QA sample</a></p>
+</main>
+</body></html>
