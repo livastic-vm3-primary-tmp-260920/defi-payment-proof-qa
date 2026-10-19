@@ -12,3 +12,5 @@ Read-only static website; no cookies, pixel trackers, hosted credentials, or che
 - No Golem/AIOZ/server-compute resale, no user wallet signing, no KYC, no CAPTCHA or security workaround.
 
 - 2026-10-19: truthful new original four-exchange funding-rate DATA QA offer added to existing site; owner VM3 local code in work/vm3-funding-rates-original-20261019 (13/13 tests and three pairs 4/4 live). OpenTask standalone second service saved DRAFT not public after visibility selector returned UNKNOWN_OUTCOME; do not claim publicly published paid API. Only original seller message/email inquiry route is live. This new module has zero actual customers, zero paid calls, zero earnings.
+
+- 2026-10-19 21:58KST compliance correction: removed funding-rate market data paid-research page/offer/structured metadata. OKX, Bybit, Bitget firstparty API terms restrict commercial market-data redistribution without license; source module archival research-only. Left independently authored Soul.Market services and existing publicly permissible USDC receipt and Solidity QA offers intact. No new income from removed offer.
