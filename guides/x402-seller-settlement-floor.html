@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0c1422">
+<meta name="robots" content="index,follow">
+<meta name="description" content="Why an x402 API can return a correct HTTP 402 but still receive no autonomous buyers: listing health, router settlement trust, independent paying customers, and actual USDC settlement evidence.">
+<link rel="canonical" href="https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/x402-seller-settlement-floor.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Why your x402 API gets no buyers despite a working HTTP 402">
+<meta property="og:description" content="A source-backed x402 seller debugging checklist separating discovery, payment routing, and real external settlements.">
+<title>x402 API Has No Buyers? Settlement Floor & Router Eligibility Explained | VM3</title>
+<style>
+:root{color-scheme:dark;--bg:#0c1422;--surface:#131f30;--line:#324256;--ink:#f2f6fb;--muted:#acbcd0;--mint:#8decbe;--amber:#ffd98a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.72 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header,main,footer{max-width:850px;padding:26px;margin:auto}
+header{border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}
+header nav{display:flex;gap:16px;flex-wrap:wrap}
+a{color:var(--mint);overflow-wrap:anywhere}a:focus-visible{outline:3px solid var(--amber);outline-offset:4px}
+h1{font-size:clamp(2.15rem,5vw,3.6rem);line-height:1.12;letter-spacing:-.04em;margin:24px 0}
+h2{font-size:1.45rem;line-height:1.3;margin-top:35px}p,li{color:var(--muted)}
+strong{color:var(--ink)}li{margin:9px 0}.eyebrow{color:var(--mint);font-size:.78rem;text-transform:uppercase;font-weight:800;letter-spacing:.12em}
+.note{padding:18px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+code{color:var(--mint)}pre{overflow:auto;background:#07111f;border:1px solid var(--line);padding:16px;border-radius:12px;font-size:.87rem}
+table{border-collapse:collapse;width:100%}td,th{border-bottom:1px solid var(--line);padding:12px;text-align:left;vertical-align:top}td{color:var(--muted)}
+.cta{margin-top:34px;background:var(--surface);padding:26px;border:1px solid var(--mint);border-radius:15px}
+.button{display:inline-block;background:var(--mint);color:#09211b;font-weight:800;text-decoration:none;padding:11px 15px;border-radius:9px;margin:6px}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:.87rem}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"Why a working x402 HTTP 402 endpoint may receive no buyers","description":"Source-backed first-party x402 seller marketplace evidence: healthy merchant, no organic router eligibility, and the difference between real independent USDC settlements and unpaid quote checks.","datePublished":"2026-10-20","dateModified":"2026-10-20","inLanguage":"en","mainEntityOfPage":{"@type":"WebPage","@id":"https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/x402-seller-settlement-floor.html"},"author":{"@type":"Organization","name":"VM3 Independent Public Payment QA"}}
+</script>
+</head>
+<body>
+<header>
+<a href="../"><strong>VM3 PAYMENT / QA</strong></a>
+<nav aria-label="Site"><a href="x402-402-preflight.html">HTTP 402 basics</a><a href="../#direct-x402">Paid 0.01 USDC tool</a><a href="../#evidence">Original tests</a></nav>
+</header>
+<main>
+<div class="eyebrow">Free original seller research · October 20, 2026</div>
+<h1>My x402 API returns <code>402</code>. So why does it have no buyers?</h1>
+<p><strong>HTTP 402 is a quote, not a sale.</strong> A valid Base USDC x402 payment challenge tells a compatible client what it could pay. It does not show that a customer exists, that an autonomous routing marketplace selects the service, or that a USDC payment settled.</p>
+<p>The useful diagnostic is to separate <strong>four independent gates</strong>: (1) technical payment compatibility, (2) discoverability, (3) buyer trust and routing eligibility, and (4) uniquely settled external customer payments.</p>
+<div class="note"><strong>A real but limited case study.</strong> On October 20, 2026, one genuinely live seller origin showed 17 indexed tools, nine marked paid, healthy status and a parseable x402 manifest. Yet its public <code>routerDispatchEligible</code> was <code>false</code> with <code>routerDispatchReason = settlement_required</code>. The Base-specific explanation was <em>below the settlement floor</em>. These are a single public marketplace's observations at a point in time, not a universal rule for every x402 router or a promise of sales.</div>
+
+<h2>1. Check the actual live HTTP 402 payment offer</h2>
+<p>The exact merchant endpoint matters. A homepage returning 200 is not an x402 payment offer. A valid public x402 v2 challenge includes the base64 <code>PAYMENT-REQUIRED</code> header, <code>x402Version: 2</code>, compatible network and canonical token, atomic amount and intended public recipient. For example, Base mainnet is <code>eip155:8453</code> and native Circle USDC is <code>0x833589fCD6eDb6E08f4C7C32D4f71b54bdA02913</code>.</p>
+<p>You can inspect our own example <em>without paying</em>:</p>
+<pre><code>curl -si \
+  https://vm5-openapi-x402.onrender.com/v1/x402-preflight
+
+# Expected: HTTP 402 + PAYMENT-REQUIRED header
+# Price: 10000 atomic units = 0.010000 Base USDC</code></pre>
+<p>Never paste signed payment headers, EIP-3009 authorization payloads, cookies, access tokens or a wallet's recovery phrase into a diagnostic service. Parsing a public unsigned quote is a completely different operation from spending USDC.</p>
+
+<h2>2. Being listed is not being selected for a purchase</h2>
+<table>
+<thead><tr><th>Marketplace signal</th><th>What it actually establishes</th></tr></thead>
+<tbody>
+<tr><td>Valid 402 / valid manifest</td><td>A payment request can be discovered and decoded. It proves no customer payment.</td></tr>
+<tr><td>Healthy / routable seller catalog</td><td>A crawler reaches the seller's declared route. The buying agent may still decline to call it.</td></tr>
+<tr><td>Router eligible</td><td>A particular router has enough protocol, payment-chain, and trust evidence to consider buying. Check the actual <em>reason</em> field.</td></tr>
+<tr><td>Directory <code>paid_verified</code></td><td>When backed by the directory's recorded, successful on-chain transfer and delivered response, a specific buyer verification occurred. It does not prove many independent organic customers.</td></tr>
+<tr><td>Final canonical USDC transfer to owner</td><td>Actual transferred tokens, once chain, recipient, asset, amount, transaction hash and log index are independently checked.</td></tr>
+</tbody>
+</table>
+<p>The public <a href="https://agent402.tools/api/index?seller=vm5-openapi-x402.onrender.com">Agent402 origin index</a> shows both the merchant's successful crawl and its separate dispatch result. The <a href="https://agent402.tools/sell">seller methodology</a> explains that its trust decision uses authentic settlements from independent outside payers. The exact trust floor may vary, so do not invent a target number based on one crawler result.</p>
+
+<h2>3. A verification scout is genuine payment, but not broad market demand</h2>
+<p>An independent automated directory can legally purchase a published x402 product and pay a real on-chain USDC amount. That is a real receipt when its token transfer and delivered response are independently verified. It should be counted <strong>once per actual final token-transfer event</strong>, not once for every badge, website, index or seller account referencing it.</p>
+<p>We distinguish an independently paid <a href="https://api.nohumans.directory/v1/listings/7fb76f81-0b5">template service</a> and <a href="https://api.nohumans.directory/v1/listings/816d6709-3d0">CSV-report service</a> from a <a href="https://api.nohumans.directory/v1/listings/19b2a8d6-feb">quote analyzer that is verified but not independently paid</a>. The two historic earlier payments were performed by the same external verification program; they are <strong>not proof of two unrelated customers</strong>.</p>
+<p>Artificial payments from the seller's own funds or coordinated linked accounts do not solve a genuine customer-acquisition problem. Paid verification campaigns can cost much more than they remit to the seller. Do not use them to inflate apparent sales or to try to defeat a platform's independent-payer criteria.</p>
+
+<h2>4. Improve conversion, not the vanity metric</h2>
+<ul>
+<li><strong>Match a concrete buyer question.</strong> Document the supported input, exact output fields, realistic failure cases, timeouts and data limitations.</li>
+<li><strong>Give a genuinely free preview.</strong> Show an explicit synthetic sample so a buyer can inspect the schema without signing a transaction.</li>
+<li><strong>Publish one original reliable endpoint.</strong> Keep it available, version-stable, fast and free of authentication keys or unexpected charges beyond the quoted x402 offer.</li>
+<li><strong>Show actual external evidence.</strong> Only cite independently verified accepted paid receipts and provenance; distinguish test fixtures and unpaid HTTP 402s.</li>
+<li><strong>Seek unrelated customers.</strong> A funded business need, an agreed paid deliverable and legitimate buyer payment matter more than duplicate directory submissions.</li>
+</ul>
+<p>In our case, the preflight tool checks <em>only public unsigned quote structure</em>. It does not prove that a merchant is honest, that someone owns the advertised wallet, that the order router will buy a product, or that payment was received. A full operational or financial audit is a separately scoped engagement, not a hidden feature of a $0.01 syntax checker.</p>
+
+<div class="cta">
+<div class="eyebrow">Free examples · optional actual x402 checkout</div>
+<h2>Need to rule out a malformed public x402 v2 quote?</h2>
+<p>First inspect our <a href="https://vm5-openapi-x402.onrender.com/v1/x402-sample">free, explicitly synthetic JSON example</a>. If a structural report would help your integration, the live <a href="https://vm5-openapi-x402.onrender.com/v1/x402-preflight">GET /v1/x402-preflight</a> returns a real unpaid x402 v2 HTTP 402 asking for <strong>0.010000 native Circle Base USDC</strong>. A compatible client must consciously authorize and settle that payment before the response is purchased. Merely opening this page or the 402 route does not transfer money.</p>
+<a class="button" href="https://vm5-openapi-x402.onrender.com/v1/x402-sample">See the free preview ↗</a>
+<a class="button" href="https://vm5-openapi-x402.onrender.com/v1/x402-preflight">Read the 0.01-USDC x402 quote ↗</a>
+<p><small>AI-assisted, original public-source QA for one human owner. The developer of this route has not verified a paid purchase of this new preflight product. Previous separate real payments to its same-owner host must not be misattributed. No guaranteed route selection, earning, settlement or customer adoption.</small></p>
+</div>
+<h2>Primary sources to reproduce the observations</h2>
+<ul>
+<li><a href="https://agent402.tools/api/index?seller=vm5-openapi-x402.onrender.com">Agent402 current index and dispatch reason</a> — public and read-only, including health, tool count and router eligibility.</li>
+<li><a href="https://agent402.tools/sell">Agent402 seller guide</a> — proof-of-settlement and independent payer policy, including unproven routes.</li>
+<li><a href="https://nohumans.directory/llms.txt">NoHumans first-party machine-readable methods</a> — unpaid verification vs actual purchased, validated JSON output.</li>
+<li><a href="https://github.com/x402-foundation/x402/blob/main/specs/transports-v2/http.md">Official x402 v2 HTTP transport specification</a> — what the 402 and payment-response headers do.</li>
+<li><a href="https://github.com/livastic-vm3-primary-tmp-260920/vm3-x402-quote-preflight">Independent original-source quote analyzer</a> — machine-checkable source and isolated test fixtures, not a paid-client testimonial.</li>
+</ul>
+</main>
+<footer>VM3 independent buyer-proof engineering · First-party observations at October 20, 2026 · No analytics, wallet connection, or secret collection.</footer>
+</body>
+</html>
