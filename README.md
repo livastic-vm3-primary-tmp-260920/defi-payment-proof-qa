@@ -10,3 +10,5 @@ Read-only static website; no cookies, pixel trackers, hosted credentials, or che
 - GitHub PR #4608 is open and unpaid; no client testimonial or audit certification.
 - Built to be hosted at https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/
 - No Golem/AIOZ/server-compute resale, no user wallet signing, no KYC, no CAPTCHA or security workaround.
+
+- 2026-10-19: truthful new original four-exchange funding-rate DATA QA offer added to existing site; owner VM3 local code in work/vm3-funding-rates-original-20261019 (13/13 tests and three pairs 4/4 live). OpenTask standalone second service saved DRAFT not public after visibility selector returned UNKNOWN_OUTCOME; do not claim publicly published paid API. Only original seller message/email inquiry route is live. This new module has zero actual customers, zero paid calls, zero earnings.
