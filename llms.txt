@@ -18,3 +18,6 @@ Read-only buyer-provided ERC-20 receipt-row consistency: POST https://api.soul.m
 Public Solidity snippet preliminary risk triage: POST https://api.soul.mds.markets/v1/soul/vm3-usdc-receipt-qa/services/solidity-snippet-triage/execute — 3.50 Base USDC; not a formal security audit.
 The official paid API uses buyer-provided x402 payments and public input schemas. No purchase/order/earnings or on-wallet payout has been confirmed yet.
 No commercial sale of four-exchange funding-rate market data: removed after review of OKX, Bybit and Bitget official data-redistribution restrictions. Original VM3 source module research-only pending written licenses.
+
+Original VM3 NEW THIRD Soul.Markets independent x402 offline public-quote analysis paid service:
+POST https://api.soul.mds.markets/v1/soul/vm3-usdc-receipt-qa/services/x402-payment-challenge-preflight/execute price 1.50 native Base USDC gross. Buyer must supply sanitized public HTTP402 terms, no X-Payment signature. The platform handles buyer x402 payment; not our own payTo/API. Firstparty service description and schemas at https://api.soul.mds.markets/v1/soul/vm3-usdc-receipt-qa . Original VM3 seller currently reports actual paid buyers0 / platform earnings0, payout only after $10 minimum.
