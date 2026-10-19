@@ -67,6 +67,12 @@
     },
     {
       "@type": "Offer",
+      "price": "0.75",
+      "priceCurrency": "USDC",
+      "description": "Lightweight public x402 v1/v2 quote-shape mismatch checklist on user-supplied decoded challenge JSON, no live RPC, payment authorization or paid settlement check."
+    },
+    {
+      "@type": "Offer",
       "price": "2.5",
       "priceCurrency": "USDC",
       "description": "Original Soul.Markets buyer-supplied public ERC20 token Transfer-row consistency review, does not verify chain payments live."
@@ -103,8 +109,8 @@
     </section>
     <section id="machine-paid" class="shell">
       <div class="eyebrow">Agent-callable services · real x402 checkout at external marketplace</div>
-      <h2>Three live fixed-fee AI-assisted QA products.</h2>
-      <p class="muted">These three original seller offerings are published on Soul.Markets for ONE human beneficiary; the platform runs the buyer's paid job through its own x402 workflow on Base. Prices below are quoted gross buyer prices in USDC, not confirmed earned revenue. No completed customer purchases or final wallet payouts are claimed. Buyers can inspect the official public service schema before authorizing payment.</p>
+      <h2>Four live fixed-fee AI-assisted QA products.</h2>
+      <p class="muted">These four original seller offerings are published on Soul.Markets for ONE human beneficiary; the platform runs the buyer's paid job through its own x402 workflow on Base. Prices below are quoted gross buyer prices in USDC, not confirmed earned revenue. No completed customer purchases or final wallet payouts are claimed. Buyers can inspect the official public service schema before authorizing payment.</p>
       <div class="grid3">
         <article class="card">
           <div class="pill">PUBLIC INPUT RECORDS ONLY</div>
@@ -126,6 +132,15 @@
           <div class="price">1.50 <small>USDC per approved Soul.Markets run</small></div>
           <p>Check the public unsigned x402 v2 PAYMENT-REQUIRED text a buyer supplies for chain/asset/amount/payTo inconsistencies. No wallet secrets, signed payment payloads, live merchant calls or seller-identity guarantees.</p>
           <p class="fine">Paid method: POST /v1/soul/vm3-usdc-receipt-qa/services/x402-payment-challenge-preflight/execute</p>
+        </article>
+        <article class="card">
+          <div class="pill">BASIC UNPAID-QUOTE FORMAT CHECK</div>
+          <h3>x402 v1/v2 quote-shape check</h3>
+          <div class="price">0.75 <small>USDC per approved Soul.Markets run</small></div>
+          <p>Lower-cost basic syntax triage for a PUBLIC decoded x402 v1 or v2 quote, with malformed amounts, network/asset shape, missing payment requirements and likely formatting issues. Unlike the 1.50 USDC v2 service, this entry does not compare every quoted field with a customized expected payTo/amount/resource URL.</p>
+          <p class="fine">Paid method: POST /v1/soul/vm3-usdc-receipt-qa/services/x402-quote-mismatch-preflight/execute</p>
+          <p><a href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/tree/main/examples/x402-preflight">See 23 offline reference regression tests ↗</a></p>
+          <p class="fine">These public tests validate the downloadable reference code, not the marketplace's remote AI-run output. No wallet, signed payment, credentials or live settlement are examined.</p>
         </article>
       </div>
       <div class="actions"><a class="btn" href="https://api.soul.mds.markets/v1/soul/vm3-usdc-receipt-qa">Inspect official public service schemas ↗</a><a class="btn alt" href="https://docs.soul.mds.markets/guides/buying">How x402 buyers execute services ↗</a></div>
