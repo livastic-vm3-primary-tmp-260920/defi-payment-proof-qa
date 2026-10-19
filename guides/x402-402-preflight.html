@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0c1422">
+<meta name="robots" content="index,follow">
+<meta name="description" content="Free x402 HTTP 402 preflight checklist: Base mainnet USDC, PAYMENT-REQUIRED v2, token address, atomic units, payTo and safe unsigned quote inspection.">
+<link rel="canonical" href="https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/x402-402-preflight.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Debug x402 HTTP 402 without spending or wallet signatures">
+<meta property="og:description" content="Learn to inspect a public unpaid x402 quote without confusing a price quote with a settled USDC receipt.">
+<title>How to Debug x402 HTTP 402 on Base USDC | Free Safety Checklist</title>
+<style>
+:root{color-scheme:dark;--bg:#0c1422;--surface:#131f30;--line:#324256;--ink:#f2f6fb;--muted:#acbcd0;--mint:#8decbe;--amber:#ffd98a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.72 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header,main,footer{max-width:850px;padding:26px;margin:auto}
+header{border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
+header nav{display:flex;flex-wrap:wrap;gap:16px}
+a{color:var(--mint)}a:focus-visible{outline:3px solid var(--amber);outline-offset:4px}
+h1{font-size:clamp(2.2rem,5vw,3.5rem);line-height:1.12;letter-spacing:-.04em;margin:24px 0}
+h2{font-size:1.5rem;line-height:1.25;margin-top:35px}
+p,li{color:var(--muted)}
+strong{color:var(--ink)}
+li{margin:9px 0}
+.eyebrow{color:var(--mint);font-size:.78rem;text-transform:uppercase;font-weight:800;letter-spacing:.12em}
+.note{padding:18px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+code,pre{font-family:ui-monospace,Menlo,Consolas,monospace}
+code{color:var(--mint)}
+pre{overflow:auto;background:#07111f;border:1px solid var(--line);padding:18px;border-radius:12px;line-height:1.5;font-size:.87rem}
+table{border-collapse:collapse;width:100%}
+td,th{border-bottom:1px solid var(--line);padding:12px;text-align:left;vertical-align:top;overflow-wrap:anywhere}
+td{color:var(--muted)}
+.cta{margin-top:34px;background:var(--surface);padding:26px;border:1px solid var(--mint);border-radius:15px}
+.button{display:inline-block;background:var(--mint);color:#09211b;font-weight:800;text-decoration:none;padding:12px 17px;border-radius:10px;margin:6px}
+footer{border-top:1px solid var(--line);color:var(--muted);font-size:.87rem}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"TechArticle","headline":"How to debug x402 HTTP 402 on Base USDC without spending","description":"A safe public-only x402 challenge inspection guide with official primary sources and a separately purchased QA option.","datePublished":"2026-10-19","dateModified":"2026-10-19","inLanguage":"en","mainEntityOfPage":{"@type":"WebPage","@id":"https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/x402-402-preflight.html"},"author":{"@type":"Organization","name":"VM3 Independent Public Payment QA"}}
+</script>
+</head>
+<body>
+<header>
+<a href="../"><strong>VM3 PAYMENT / QA</strong></a>
+<nav aria-label="Site"><a href="../#machine-paid">Paid microservices</a><a href="../#evidence">Source proof</a><a href="../#contact">Request a quote</a></nav>
+</header>
+<main>
+<div class="eyebrow">Free public reference · October 19, 2026</div>
+<h1>Debug an x402 <code>402 Payment Required</code> without signing anything</h1>
+<p>A paid API returning HTTP 402 has shown a <strong>payment demand, not a paid receipt</strong>. Even if the amount looks correct, the request does not prove that a buyer sent USDC, that the funds reached the seller, that the merchant is trustworthy or that the response was delivered.</p>
+<div class="note"><strong>Privacy boundary.</strong> Inspect only a merchant's <em>public, unpaid</em> challenge. Never paste <code>PAYMENT-SIGNATURE</code>, <code>X-PAYMENT</code>, <code>Authorization</code>, cookies, API bearer tokens, EIP-3009 signed authorizations, seed phrases or wallet keys into support tickets, email, a service input or this page. No transaction needs to be signed for the checks below.</div>
+<h2>Step 1 — Identify the protocol version</h2>
+<p>Under the <strong>x402 v2 HTTP transport</strong>, an unpaid request is answered with HTTP 402 and the <code>PAYMENT-REQUIRED</code> response header. Its value is base64-encoded JSON with <code>x402Version: 2</code>, a <code>resource</code> object, and one or more <code>accepts</code> options. The header's role is different from the client-side <code>PAYMENT-SIGNATURE</code> header used after an authorized payment.</p>
+<p>Older x402 v1 clients can use other JSON fields, network names and the legacy <code>X-PAYMENT</code> name. A v1 response should be handled as v1; changing the header name alone does not create a valid v2 payment.</p>
+<h2>Step 2 — Decode the public quote locally</h2>
+<p>This no-network Python example decodes only the seller's <code>PAYMENT-REQUIRED</code> value. Use a dummy/example string until you have verified the input came from an <em>unpaid response</em>. The code does not ask for a wallet, authorize a charge, settle a transaction or check a blockchain.</p>
+<pre><code>import base64, json
+public_header = "PASTE_ONLY_PUBLIC_PAYMENT_REQUIRED_BASE64"
+assert len(public_header) &lt;= 12000
+raw = base64.b64decode(public_header, validate=True)
+assert len(raw) &lt;= 8000
+quote = json.loads(raw)
+assert isinstance(quote, dict)
+print(quote.get("x402Version"))
+print(len(quote.get("accepts", [])))</code></pre>
+<p>Parse failure can mean an empty header, damaged base64, an HTML reverse-proxy error, an upstream response that doesn't implement v2, or a body where your client expected the v2 header. A parseable quote alone is not assurance that the charge is correct.</p>
+<h2>Step 3 — Validate the most useful public fields</h2>
+<table>
+<thead><tr><th>Public field</th><th>Why it matters</th></tr></thead>
+<tbody>
+<tr><td><code>network</code></td><td>Base mainnet is <code>eip155:8453</code>. Base Sepolia testnet is <code>eip155:84532</code>. Never mix test USDC and mainnet USDC.</td></tr>
+<tr><td><code>asset</code></td><td>Canonical Base mainnet Circle USDC is <code>0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</code>. A token's displayed symbol alone does not establish its contract identity.</td></tr>
+<tr><td><code>amount</code></td><td>For x402 v2 exact payments this is normally a decimal integer string in atomic units. With six-decimal USDC, <code>"10000"</code> means 0.010000 USDC, not 10,000 USDC.</td></tr>
+<tr><td><code>payTo</code></td><td>For EVM chains it should have the right address shape, <code>0x</code> followed by 40 hexadecimal characters. Correct format does not prove seller ownership.</td></tr>
+<tr><td><code>resource.url</code></td><td>Check that the quote names the intended HTTPS resource rather than an unexpected unrelated domain.</td></tr>
+<tr><td><code>maxTimeoutSeconds</code></td><td>Check for a positive timeout and compatibility with the client. Short validity can make otherwise valid requests fail.</td></tr>
+<tr><td><code>scheme</code></td><td>Match the advertised payment mechanism, supported handler, chain and asset. If multiple <code>accepts</code> choices exist, the client must deliberately select a compatible one.</td></tr>
+</tbody>
+</table>
+<h2>Step 4 — Why a marketplace might show a different price</h2>
+<p>Some marketplaces issue a buyer-specific quote. For instance, a public EVM buyer address in an <code>X-Agent-ID</code> header may be required to receive the advertised service price, and a generic preflight request may return a different bootstrap 402 quote. Consult the marketplace's <em>official</em> buyer guide before evaluating its charge. A quote is still not an actual purchased job.</p>
+<h2>Step 5 — Understand what proves money really arrived</h2>
+<p>An actual Base USDC receipt needs independent evidence: correct chain, finalized successful transaction, canonical token contract, actual ERC-20 Transfer log, correct recipient, token units and a unique transaction hash plus log index. Correlate the event with a genuine outside buyer. An API response 200, market listing, job-status badge, unsigned HTTP 402 quote and platform pending balance are different facts and are not themselves wallet settlement evidence.</p>
+<h2>Step 6 — Reproduce the public checks</h2>
+<p>Our <a href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/tree/main/examples/x402-preflight">original free Python checker and 23 synthetic offline tests</a> cover Base network/asset mismatches, quote version handling, atomic amount validation, malformed addresses and absence of sensitive headers. It makes no live network request and does not validate third-party vendor delivery. The tests do <strong>not</strong> imply that a separately hosted AI model uses this exact deterministic code.</p>
+<div class="cta">
+<div class="eyebrow">Optional paid help</div>
+<h2>Want a structured public x402 diagnosis?</h2>
+<p>The original VM3 single-human-owner, AI-assisted Soul.Markets seller offers a basic public v1/v2 unsigned quote-shape checklist for <strong>0.75 USDC per authorized marketplace job</strong> and a more detailed v2 comparison with expected payee/resource/amount for <strong>1.50 USDC</strong>. Both are static analyses; neither is a security certification, wallet-verification service or actual payment guarantee. The marketplace controls the buyer's x402 payment and handles its own settlement.</p>
+<a class="button" href="https://api.soul.mds.markets/v1/soul/vm3-usdc-receipt-qa">Inspect public services and input schemas</a>
+<p><small>All prices are advertised gross quotes. We do not claim prior VM3 marketplace paid clients or new wallet income. Do not share any private credential or signature.</small></p>
+</div>
+<h2>Authoritative references</h2>
+<ul>
+<li><a href="https://github.com/x402-foundation/x402/blob/main/specs/transports-v2/http.md">Official x402 v2 HTTP transport specification</a> — status code, public quote header and settlement response.</li>
+<li><a href="https://github.com/x402-foundation/x402/blob/main/specs/x402-specification-v2.md">Official x402 v2 data schema</a> — required fields and accepted payment options.</li>
+<li><a href="https://docs.soul.mds.markets/guides/buying">Soul.Markets buyer guide</a> — buyer-specific quotes, authorized payment and job-status polling.</li>
+</ul>
+</main>
+<footer>VM3 independent source-backed public QA · AI assistance disclosed · No guaranteed security outcome, profit, payment or customer. No live chain operations.</footer>
+</body>
+</html>

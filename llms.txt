@@ -23,3 +23,5 @@ No commercial sale of four-exchange funding-rate market data: removed after revi
 
 Original VM3 NEW THIRD Soul.Markets independent x402 offline public-quote analysis paid service:
 POST https://api.soul.mds.markets/v1/soul/vm3-usdc-receipt-qa/services/x402-payment-challenge-preflight/execute price 1.50 native Base USDC gross. Buyer must supply sanitized public HTTP402 terms, no X-Payment signature. The platform handles buyer x402 payment; not our own payTo/API. Firstparty service description and schemas at https://api.soul.mds.markets/v1/soul/vm3-usdc-receipt-qa . Original VM3 seller currently reports actual paid buyers0 / platform earnings0, payout only after $10 minimum.
+
+Free x402 HTTP402 v1/v2 public challenge debugging reference: https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/x402-402-preflight.html (safe unsigned diagnostics, not a real settlement receipt). Optional VM3 original single-owner paid Basic 0.75 and Extended 1.50 USDC marketplace services are linked separately; buyer must authorize its payment.
