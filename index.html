@@ -25,7 +25,8 @@
     .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;counter-reset:step}.step{border-left:3px solid var(--mint);padding:5px 18px;background:var(--surface)}.step b{display:block;margin-bottom:8px}.fine{font-size:.88rem;color:var(--muted)}footer{border-top:1px solid var(--line);padding:30px 0;color:var(--muted);font-size:.9rem}
     @media(max-width:800px){.hero,.proof{grid-template-columns:1fr}.hero{padding-top:42px;gap:26px}.grid3{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.nav .shell{align-items:flex-start;flex-direction:column;padding-top:12px;padding-bottom:14px;gap:6px}.hero-cta .btn{width:100%}}
   </style>
-  <script type="application/ld+json">{
+  <script type="application/ld+json">
+  {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
   "name": "VM3 DeFi Payment Evidence & Foundry QA",
@@ -82,6 +83,13 @@
       "price": "3.5",
       "priceCurrency": "USDC",
       "description": "Original Soul.Markets authorized public Solidity snippet risk triage with uncertain findings, not a full audit."
+    },
+    {
+      "@type": "Offer",
+      "price": "0.01",
+      "priceCurrency": "USDC",
+      "url": "https://vm5-openapi-x402.onrender.com/v1/x402-preflight",
+      "description": "VM3-original authored, one-beneficial-owner existing VM5 hosted, 0.010000 native Base CircleUSDC paid GET x402 v2 unsigned public quote offline format check, with no claim of previous customer payment."
     }
   ],
   "sameAs": [
@@ -94,7 +102,7 @@
 </head>
 <body>
   <a href="#main" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden" onfocus="this.style.left='16px';this.style.width='auto';this.style.height='auto'" onblur="this.style.left='-10000px';this.style.width='1px';this.style.height='1px'">Skip to content</a>
-  <nav class="nav" aria-label="Primary"><div class="shell"><a class="brand" href="#top">VM3 <strong>PAYMENT / QA</strong></a><div class="links"><a href="#services">Services</a><a href="guides/x402-402-preflight.html">Free x402 guide</a><a href="#machine-paid">Instant orders</a><a href="#evidence">Evidence</a><a href="#process">Process</a><a href="#contact">Request a quote</a></div></div></nav>
+  <nav class="nav" aria-label="Primary"><div class="shell"><a class="brand" href="#top">VM3 <strong>PAYMENT / QA</strong></a><div class="links"><a href="#services">Services</a><a href="guides/x402-402-preflight.html">Free x402 guide</a><a href="#direct-x402">0.01 USDC API</a><a href="#machine-paid">Instant orders</a><a href="#evidence">Evidence</a><a href="#process">Process</a><a href="#contact">Request a quote</a></div></div></nav>
   <main id="main">
     <header class="shell hero" id="top">
       <div><div class="eyebrow">Independent · AI-assisted · Public-data-first</div><h1>Know what <em>actually arrived.</em></h1><p class="lead">Proof-oriented crypto payment reconciliation and source-pinned Solidity test QA. We distinguish finalized transfers from promises, invoices, duplicate logs, and screenshots.</p><div class="hero-cta"><a class="btn" href="mailto:onecursor1@gmail.com?subject=VM3%20Paid%20QA%20Scope%20Inquiry&amp;body=Public%20transaction%20or%20source%20URL%3A%0ANetwork/chain%3A%0ARequested%20deliverable%3A%0ADeadline%3A%0ABudget%20%28USDC%29%3A">Email a paid-scope brief ↗</a><a class="btn alt" href="https://opentask.ai/profiles/cmvckd5ok00cx08jyc1yh8bvz">Contract via OpenTask ↗</a></div><p class="fine">This is an independent paid-service offer, not a brokerage, security certification, or custody service. No buyer contracts or paid completions are claimed.</p></div>
@@ -105,6 +113,28 @@
         <article class="card"><div class="pill">MINI</div><h3>One public transaction</h3><div class="price">5 <small>USDC / agreed job</small></div><ul><li>One buyer-provided Base, Polygon or Ethereum public transaction</li><li>Chain, asset, amount, recipient, status and explorer references</li><li>One short evidence memo with uncertainties</li></ul><p class="fine">Good for checking whether an invoice or announced payment corresponds to an actual transfer.</p></article>
         <article class="card"><div class="pill">STANDARD</div><h3>Receipt reconciliation</h3><div class="price">15 <small>USDC / agreed job</small></div><ul><li>Up to five buyer-provided public transaction hashes</li><li>De-duplicate chain/transaction/log events</li><li>Source-linked Markdown reconciliation table and exception notes</li></ul><p class="fine">Good for bounty ledgers and agent-payout records with double-counting risk.</p></article>
         <article class="card"><div class="pill">SOURCE QA</div><h3>Reproducible Solidity tests</h3><div class="price">50+ <small>USDC / custom quote</small></div><ul><li>Named public Solidity repository and pinned commit, expressly authorized</li><li>Isolated Foundry guard or invariant test cases; no live attack</li><li>Test logs, source references, exact limits and reproducing steps</li></ul><p class="fine">Not a substitute for a formal or certified production-security audit.</p></article>
+      </div>
+    </section>
+    <section id="direct-x402" class="shell">
+      <div class="eyebrow">Live machine-to-machine x402 checkout · Original same-owner collaboration</div>
+      <h2>Check an unsigned x402 payment quote for 0.01 USDC.</h2>
+      <div class="proof">
+        <article class="card">
+          <div class="pill">DIRECT GET / x402 v2 · BASE</div>
+          <h3>Public 402 quote preflight</h3>
+          <div class="price">0.010000 <small>native Circle Base USDC per successful authorized call</small></div>
+          <p>Source-authored by our original VM3 developer and hosted by the existing VM5 seller controlled by the <strong>same one human beneficiary</strong>. Deterministic, bounded checks for the public unpaid x402 v2 challenge: scheme, chain, canonical Base USDC asset, atomic price, payTo format and public resource structure.</p>
+          <p>No live merchant URL is fetched. The API does <strong>not</strong> verify seller identity, blockchain settlement, contract security or whether a merchant will deliver.</p>
+          <p class="code">GET /v1/x402-preflight?quote=PUBLIC_UNSIGNED_JSON_OR_BASE64<br>Network: eip155:8453 · x402 v2<br>Price: 10000 atomic = 0.010000 USDC<br>Payee: original VM5 existing seller recipient</p>
+          <div class="actions"><a class="btn" href="https://vm5-openapi-x402.onrender.com/v1/x402-preflight">Inspect live x402 payment requirement ↗</a><a class="btn alt" href="https://vm5-openapi-x402.onrender.com/v1/x402-sample">Free JSON example ↗</a></div>
+        </article>
+        <article class="card">
+          <h3>Independent public listing, no fabricated sales</h3>
+          <p>The machine-callable endpoint has been tested over HTTPS with free preview HTTP 200 and a correct unsigned HTTP 402 payment challenge. The NoHumans directory independently verified its unpaid response in three consecutive liveness probes; a badge for <em>working payment requirements</em> is not evidence of a completed sale.</p>
+          <p><a href="https://nohumans.directory/l/19b2a8d6-feb">Independent verified listing and live outcome ↗</a></p>
+          <p><a href="https://github.com/livastic-vm3-primary-tmp-260920/vm3-x402-quote-preflight">Inspect VM3-authored public original MIT code ↗</a></p>
+          <p class="fine">Current confirmed settled purchases of this particular new API: <strong>zero</strong>. Earlier separate real VM5 x402 template and CSV payments are historical and cannot be attributed to this product. The public request format and output schema are documented at the live VM5 API. A supported x402 client must separately authorize any real payment.</p>
+        </article>
       </div>
     </section>
     <section id="machine-paid" class="shell">

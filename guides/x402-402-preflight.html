@@ -91,6 +91,9 @@ print(len(quote.get("accepts", [])))</code></pre>
 <a class="button" href="https://api.soul.mds.markets/v1/soul/vm3-usdc-receipt-qa">Inspect public services and input schemas</a>
 <p><small>All prices are advertised gross quotes. We do not claim prior VM3 marketplace paid clients or new wallet income. Do not share any private credential or signature.</small></p>
 </div>
+<h2>Optional machine-readable paid preflight</h2>
+<p>In addition to the original platform-hosted human-reviewed 0.75/1.50 USDC scopes, the same human owner has published an original-source deterministic <strong>0.010000 Base Circle USDC per-call</strong> endpoint at <a href="https://vm5-openapi-x402.onrender.com/v1/x402-preflight">GET /v1/x402-preflight</a>, hosted by the existing VM5 merchant. A <a href="https://vm5-openapi-x402.onrender.com/v1/x402-sample">free sample</a> demonstrates the output without credentials, transaction signatures or money. x402 v2 quotes the optional unsigned public input in the PAYMENT-REQUIRED header. The product checks public syntax only, never merchant trust or live settlement.</p>
+<p>Its <a href="https://nohumans.directory/l/19b2a8d6-feb">independent directory record</a> verifies the unpaid 402 route, not a customer payment. <strong>There have been no verified settled purchases of this new quote-check API.</strong> Historic paid template/CSV calls belonged to separate VM5 products. Do not self-purchase this endpoint to create artificial activity or expose a signed payment header in a URL.</p>
 <h2>Authoritative references</h2>
 <ul>
 <li><a href="https://github.com/x402-foundation/x402/blob/main/specs/transports-v2/http.md">Official x402 v2 HTTP transport specification</a> — status code, public quote header and settlement response.</li>
