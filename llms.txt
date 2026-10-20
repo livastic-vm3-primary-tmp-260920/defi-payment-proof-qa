@@ -55,3 +55,8 @@ Default = quote-only, no key/wallet/signature/gas/payment. Optional real payment
 - Price: indicative 19 native Circle USDC on Base for up to five explicitly authorized public HTTPS pages from one origin, after written paid contract/acceptance. Email request is NOT a purchase.
 - Real original proof: https://github.com/livastic-vm3-primary-tmp-260920/public-web-qa-smoke-evidence-20261020 (19/19 offline tests; five original owner-controlled demo pages HTTP200). No paid customer order or 3rd-party-client experience asserted.
 - Deliverables: bounded read-only HTTP/HTML structural smoke report, reproduction evidence, suggested fixes, one agreed retest. No credentials, payments, production penetration test, human screen reader/WCAG certification, or real phone browser promised.
+
+## Free local HTML structure preflight, buyer-conversion proof (2026-10-20)
+- Zero-upload, browser-only source heuristic: https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/html-free-local-checker.html
+- Only pasted nonconfidential HTML, checks local issues, no URL fetch or form submission or signer or payment; source https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/blob/main/html-local-check.mjs . Original 18 offline tests, transparent limitations, not real site or WCAG certification.
+- Distinct paid authorized five-page public-site smoke QA pilot remains 19 native Base Circle USDC quote, no actual buyer contracts claimed.

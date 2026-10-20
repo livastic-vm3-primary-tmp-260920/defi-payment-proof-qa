@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111827">
+<meta name="robots" content="index,follow">
+<meta name="description" content="Free private HTML source preflight: detect missing title, alt attributes, duplicate IDs, broken fragment links and headline gaps in your own browser. No upload, login or wallet.">
+<link rel="canonical" href="https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/html-free-local-checker.html">
+<title>Free HTML Structure Checker — Browser Local, No Upload | VM3</title>
+<style>
+:root{color-scheme:dark;--bg:#0c1422;--panel:#142235;--border:#36485f;--ink:#f4f7fb;--muted:#b8c9da;--ok:#8defbd;--warn:#ffd193}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.62 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1020px;margin:auto;padding:20px 20px 64px}a{color:var(--ok);text-underline-offset:3px}h1{font-size:clamp(2rem,4vw,3rem);line-height:1.18;margin:18px 0}h2{margin:28px 0 12px;font-size:1.45rem}h3{font-size:1.1rem;margin:0 0 8px}
+p{margin:10px 0}.muted{color:var(--muted)}nav{font-size:14px;color:var(--muted);padding:10px 0 20px}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.1em;font-weight:800;color:var(--ok)}
+.card{border:1px solid var(--border);border-radius:13px;padding:20px;background:var(--panel);margin:16px 0}
+textarea{display:block;width:100%;min-height:205px;padding:15px;border:1px solid #75869c;border-radius:10px;background:#080f1b;color:var(--ink);font:13px/1.5 ui-monospace,Consolas,monospace;resize:vertical}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.row button,.action{border:1px solid var(--ok);background:var(--ok);color:#0a251c;font-weight:800;border-radius:9px;padding:11px 16px;cursor:pointer;text-decoration:none}
+.row button.ghost{background:transparent;color:var(--ok)}button:focus-visible,a:focus-visible,textarea:focus-visible{outline:3px solid var(--warn);outline-offset:2px}
+#report{white-space:pre-wrap;overflow-wrap:anywhere}#findings{padding-left:25px}
+#findings li{padding:10px 2px;border-bottom:1px solid var(--border);font-size:14px}
+#findings li:last-child{border:0}.pill{display:inline-block;font-size:12px;color:var(--warn);border:1px solid var(--border);border-radius:25px;padding:4px 10px;margin:3px 0}
+.small{font-size:13px;color:var(--muted)}footer{margin-top:33px;padding-top:20px;border-top:1px solid var(--border);font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body><main>
+<nav><a href="../">VM3 Payment / QA</a> / Free private HTML structure checker</nav>
+<div class="eyebrow">Free local-first preview · No file upload · No wallet · No account</div>
+<h1>Catch the obvious HTML source defects before you ship.</h1>
+<p class="muted">Paste your own <strong>non-confidential HTML source</strong>. The code performs bounded text-only checks inside this browser tab. It does not fetch your URL, submit a form, evaluate pasted scripts, send pasted text to a server, log content, or save it between page loads.</p>
+<div class="card">
+<label for="source"><strong>HTML to inspect locally</strong></label>
+<p class="small">Maximum 128 KiB UTF-8. The checker is a limited heuristic, not a valid HTML parser, renderer, accessibility conformance test or actual website QA report.</p>
+<textarea id="source" aria-label="HTML source to check locally" spellcheck="false" autocomplete="off" placeholder="Paste an HTML document here, or load an invented example. Do not paste credentials or private customer data."></textarea>
+<p class="row">
+<button type="button" id="sample" class="ghost">Load invented example</button>
+<button type="button" id="run">Check locally →</button>
+<button type="button" id="clear" class="ghost">Clear</button>
+</p>
+</div>
+<section class="card" aria-labelledby="findings-heading" id="results">
+<h2 id="findings-heading">Inspection result</h2>
+<div id="report" role="status" aria-live="polite">No inspection yet. Load the invented example or paste your own public HTML source.</div>
+<ol id="findings" aria-label="Local heuristic findings"></ol>
+<p class="small">Results are observations from the pasted source only. A warning is not proof of a real production defect. Investigate against the actual authorized page.</p>
+</section>
+<section class="card">
+<h2>When you need a real site-level QA handoff</h2>
+<p>Source-only checks cannot verify HTTP status, redirects, live JavaScript behavior, screen reader interactions, device rendering or a complete customer journey. If you need bounded original testing on <strong>up to five publicly accessible pages from one authorized origin</strong>, see our separately agreed 19 native Base USDC QA pilot.</p>
+<p><a class="action" href="../services/public-web-qa-19-usdc.html">Review the 19 USDC paid scope ↗</a></p>
+<p class="small">This link opens a separate truthful quotation page, not a charge. Real buyer approval, written acceptance criteria and lawful payment eligibility are required before commissioned work. No paid customer orders are claimed.</p>
+</section>
+<h2>What's checked—and not checked</h2>
+<p class="muted">The heuristic looks for missing document language, title, H1 and description, missing image alt attributes, duplicated IDs, local fragment links without matching IDs, placeholder links, target-blank rel warnings and heading level gaps. Decorative images with an explicitly empty alt attribute are not automatically treated as defects. Comments, script bodies and style bodies are excluded from source markup scanning. Findings are capped in the display, but totals are preserved.</p>
+<p class="muted"><strong>Not checked:</strong> semantic accessibility, keyboard interaction, actual rendered DOM, content accuracy, full HTML5 parsing, responsive layouts, security vulnerabilities or production compliance. This example does not load a remote URL and makes no payment or wallet request.</p>
+<p class="small">Inspect original MIT-free public source and tests: <a href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/blob/main/html-local-check.mjs">HTML checker core</a> · <a href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/blob/main/tests/html-local-check.test.mjs">18 local test cases</a>.</p>
+<footer>One Cursor · independent AI-assisted QA research · One actual human owner · 20 October 2026 · No client uploads or paid orders implied</footer>
+</main>
+<script type="module">
+import {inspectHtml} from "../html-local-check.mjs";
+const source=document.getElementById("source");
+const report=document.getElementById("report");
+const list=document.getElementById("findings");
+const sample='<!doctype html>\n<html>\n<head><meta charset="utf-8"></head>\n<body>\n<h1>Fictional sample</h1>\n<h3>Outline gap</h3>\n<img src="demo.png">\n<a href="#unresolved">Broken in-page jump</a>\n<div id="duplicate"></div><p id="duplicate">Repeated id</p>\n</body></html>';
+document.getElementById("sample").addEventListener("click",()=>{source.value=sample;report.textContent="Invented example loaded. Click Check locally to see heuristic warnings.";list.replaceChildren()});
+document.getElementById("clear").addEventListener("click",()=>{source.value="";report.textContent="Cleared. No source is stored.";list.replaceChildren()});
+document.getElementById("run").addEventListener("click",()=>{
+ list.replaceChildren();
+ try {
+   const result=inspectHtml(source.value);
+   report.textContent="Found "+result.counts.high+" high-priority source candidates and "+result.counts.review+" review items in "+result.byteLength+" bytes and "+result.tagCount+" open tags."+(result.truncated?" Display limited to first 60 findings.":"");
+   if(!result.findings.length){const li=document.createElement("li");li.textContent="No heuristic warnings in the pasted sample; not a production pass.";list.appendChild(li)}
+   for(const issue of result.findings){
+     const li=document.createElement("li");
+     li.textContent=issue.severity.toUpperCase()+" · "+issue.code+" · line "+issue.line+" — "+issue.explanation;
+     list.appendChild(li);
+   }
+ }catch(e){report.textContent=e instanceof Error?e.message:"Cannot inspect input";list.replaceChildren()}
+});
+</script>
+</body></html>
