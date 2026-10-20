@@ -22,6 +22,11 @@ test("real honest user feedback survey has select groups, no mandatory registrat
   assert.match(html,/Select the issue that actually costs you time/i);
   assert.match(html,/willingness to pay/i);
 });
+test("buyers without a local email app can use the original public feedback issue instead",()=>{
+  assert.match(html,/https:\/\/github\.com\/livastic-vm3-primary-tmp-260920\/defi-payment-proof-qa\/issues\/1/);
+  assert.match(html,/GitHub sign-in required/);
+  assert.match(html,/does not buy anything or prove demand/);
+});
 test("nothing is sent automatically; both preparing and submitting need user action",()=>{
   assert.match(html,/Open your email app to review and send/);
   assert.match(html,/type="button" id="feedback-prepare"/);
