@@ -39,3 +39,9 @@ Separately, GET https://vm5-openapi-x402.onrender.com/v1/csv-report costs the sa
 VM3 owned accurate public usage / payment-handshake guide: https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/csv-structural-preflight-005-base-usdc.html
 Canonical machine-readable OpenAPI provider spec: https://vm5-openapi-x402.onrender.com/openapi.json
 This is the original same-owner VM5 merchant receiving route, not a new VM3 wallet/merchant, and not a guaranteed customer or previously verified distinct paid POST order. Buyer provides their own authorization and settled USDC; no sale is recorded from free samples or HTTP402. No owner-funded testing, selfpayment, gas, escrow bond, invented security guarantees or identity claims.
+
+
+# Optional independent buyer-side payment integration for existing original VM5 CSV POST
+An original MIT-licensed Node.js x402 v2 **buyer** implementation is at:
+https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/tree/main/buyer-client
+Default = quote-only, no key/wallet/signature/gas/payment. Optional real payment is opt-in with a buyer's separately held low-value signer, two independent payment confirmation guards, amount0.005 native Circle BaseUSDC exactly, official paid POST endpoint and existing VM5 payTo pinned. Synthetic local SDK tests exercise 402->signed dummy request->HTTP200 and reject changed price/payee/network/asset before signing. The example did not purchase or cause a settlement for this merchant and must not be interpreted as an existing customer or paid transaction.

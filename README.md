@@ -7,7 +7,7 @@ Read-only static website; no cookies, pixel trackers, hosted credentials, or che
 - Exactly one existing owner-verified OpenTask seller route is used for any prospective fixed-scope sale; no new wallet or transaction is created.
 - Price tiers 5 / 15 / 50+ USDC are indicative; funds must arrive before revenue is recorded.
 - Demonstration Foundry 7/7 is unpaid public original work, not a paid audit or vulnerability.
-- GitHub PR #4608 is open and unpaid; no client testimonial or audit certification.
+- GitHub PR #4608 merged on October 20 after maintainer approval, but is unpaid; no client testimonial or audit certification.
 - Built to be hosted at https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/
 - No Golem/AIOZ/server-compute resale, no user wallet signing, no KYC, no CAPTCHA or security workaround.
 
@@ -20,3 +20,5 @@ Read-only static website; no cookies, pixel trackers, hosted credentials, or che
 - 2026-10-19 23:4xKST: deployed separate *VM3-authored* ORIGINAL MIT source to existing same-owner VM5 hosted original x402 service https://vm5-openapi-x402.onrender.com/v1/x402-preflight at 0.01 native Circle BaseUSDC/authorized GET, free preview https://vm5-openapi-x402.onrender.com/v1/x402-sample; source 126/126 original VM5 tests and independent NoHumans listing 19b2a8d6-feb status verified with 3/3 unpaid probes. Payout in original VM5 merchant wallet, not VM3 Soul seller wallet; one economic human owns both. Actual separately settled new quote API calls so far0; no selfbuy, gas, fees or completed buyer. Origin VM3 site homepage and this guide link the true price and marketplace proof, not fabricated x402 revenue.
 
 - 2026-10-20 02:xx KST: Added factual independent x402 merchant buyer-routing eligibility guide to existing STATIC WEBSITE at guides/x402-seller-settlement-floor.html (not another product/SKU or revenue). Source official Agent402 public index healthy17 tools/9 paid, but buyer router settlement_required below outside-payer floor; NoHumans two historical scout receipts do not imply new independent payers; original VM3 quote endpoint paid_verified false. Linked existing live genuine x402 quote + free sample, no secrets, payment, analytics or hosted microservice. Added site nav and sitemap; no claim of visitor traffic/paid client. IndexNow for the NEW PAGE URL may be accepted for indexing, but not guaranteed ranking/sale.
+
+- 2026-10-20: VM3 published an original MIT x402 v2 buyer integration under buyer-client/ for the existing one-owner VM5 native Base Circle USDC0.005 buyer-owned CSV POST, with strictly unpaid-by-default quote verification, explicit independent buyer consent, hardcoded destination/asset/chain/amount allowlist, pinned SDKs and local synthetic signed retry tests. Website links to source only; 0 new verified buyers/orders/receipts at publication. No owner MetaMask or production wallet ever used.

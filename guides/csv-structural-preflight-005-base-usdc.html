@@ -37,6 +37,9 @@
 <li>The service flags patterns; it cannot certify database integrity, privacy-law compliance, merchant identity, or production data safety.</li>
 <li>Network: <code>eip155:8453</code>; asset: native Circle USDC on Base. Only the buyer's own wallet authorizes payment.</li>
 </ul>
+<h2>Real buyer integration: inspect the exact quote, then choose whether to pay</h2>
+<p>For agent developers who want to call the <strong>customer-input POST</strong>, we publish a runnable MIT-licensed <a href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/tree/main/buyer-client">original, pinned x402 v2 buyer client with tests</a>. A normal run checks the signed-payment terms <strong>without any wallet or charge</strong>. An independently consenting external customer can opt in to a real 0.005 USDC purchase using their own low-value buyer wallet. It refuses a changed token, recipient, chain, method, resource or price before signing. No owner-funded purchase, working customer order or final USDC receipt is asserted by this SDK sample.</p>
+<p><a class="button" href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/tree/main/buyer-client">View buyer SDK + offline test cases ↗</a></p>
 <h2>Know which endpoint is useful</h2>
 <p>The separate <a href="https://vm5-openapi-x402.onrender.com/v1/csv-report">GET /v1/csv-report</a> also costs 0.005 USDC but reports on a predefined synthetic example. To inspect <strong>your own actual CSV</strong>, use <strong>POST /v1/csv-preflight</strong> instead. Neither requires registration to view the unpaid 402 payment challenge.</p>
 <h2>Provenance, ownership and transparent limitations</h2>
