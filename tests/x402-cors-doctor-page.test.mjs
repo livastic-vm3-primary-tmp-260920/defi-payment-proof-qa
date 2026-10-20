@@ -89,3 +89,14 @@ test("priced consulting never changes the free diagnostic or auto-charges the cu
   assert.match(page,/if no agreement is reached the free tool remains available at 0 USDC/i);
   assert.doesNotMatch(page,/window\.ethereum|ethereum\.request|sendTransaction|<iframe|<script\s+src=/i);
 });
+
+
+test("observable SDK-specific paid-retry mode is not a fake wallet checkout",()=>{
+  assert.match(page,/id="client-profile"/);
+  assert.match(page,/x402-fetch-2.28/);
+  assert.match(page,/id="retry-summary"/);
+  assert.match(page,/SDK/);
+  assert.match(page,/x402-browser-cors-preflight-head-header-size-audit/);
+  assert.match(page,/services\/x402-cors-remedy-150-usdc\.html/);
+  assert.match(page,/No payment occurs here/);
+});

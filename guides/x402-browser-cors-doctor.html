@@ -117,11 +117,17 @@ el("inspect-headers").addEventListener("click",()=>{
       optionsText:el("options-paste").value,
       origin:origin.value,
       paidMethod:el("paid-method").value,
+      clientProfile:el("client-profile").value,
     });
     el("offline-results").hidden=false;
     el("offline-summary").textContent=report.browserReadabilityDeclared?
-      "Pasted transcript declares a browser-visible unpaid HTTP 402 price header.":
-      "Pasted transcript contains potential blockers or is not a complete browser-visible 402 quote.";
+      "Pasted 402 declares a browser-readable unpaid price header (not proof of actual browser access).":
+      "Pasted 402 has potential price-reading blockers or lacks a complete challenge.";
+    el("retry-summary").textContent=report.preflightDeclaredCompatible===null?
+      "Paid retry: no OPTIONS transcript, so preflight compatibility is UNTESTED.":
+      report.preflightDeclaredCompatible?
+      "Paid retry: pasted OPTIONS declares the required headers allowed for this selected client profile. Signed retry and settlement remain UNTESTED.":
+      "Paid retry: pasted OPTIONS contains a PRE-FLIGHT BLOCKER for this selected client profile. See findings below.";
     el("offline-fail").replaceChildren();
     el("offline-warn").replaceChildren();
     el("offline-pass").replaceChildren();
@@ -234,15 +240,19 @@ el("live-probe").addEventListener("click",async()=>{
 <div>
 <label for="paid-method">Method you intend to pay for</label>
 <select id="paid-method"><option value="POST">POST with JSON body</option><option value="GET">GET (browser with payment-signature retry)</option></select>
+<label for="client-profile">Client profile to assess (pick your actual version)</label>
+<select id="client-profile"><option value="standard">Standards-compliant browser client (no extra SDK retry header)</option><option value="x402-fetch-2.28">@x402/fetch 2.28.0 browser paid retry (October 2026 observed)</option></select>
+<p class="caption">In the measured @x402/fetch v2.28.0 retry, the library sends <code>Access-Control-Expose-Headers</code> as a request header. Although it belongs on responses, Chrome asks permission to send it. An OPTIONS allow-list that works for a minimal client may block this specific SDK. This is <a href="https://llm4agents.com/blog/x402-browser-cors-preflight-head-header-size-audit">independently documented behavior observed October 18, 2026</a>, not a blanket claim about other versions. Check your installed SDK before interpreting results.</p>
 <label for="options-paste">OPTIONS preflight response HEADERS, if collected</label>
 <textarea id="options-paste" spellcheck="false" placeholder="HTTP/2 204&#10;Access-Control-Allow-Origin: https://your-buyer.example.org&#10;Access-Control-Allow-Methods: GET,POST,OPTIONS&#10;Access-Control-Allow-Headers: Content-Type,PAYMENT-SIGNATURE"></textarea>
-<p class="caption">For a POST buyer with JSON, both payment-signature and content-type belong in the allow list. If you omit the OPTIONS transcript, the tool marks preflight untested rather than passing it.</p>
+<p class="caption">For JSON POST, both <code>PAYMENT-SIGNATURE</code> and <code>Content-Type</code> must be allowed. A GET retry does not inherently need JSON Content-Type. Selecting the observed 2.28.0 SDK additionally checks its unintended request <code>Access-Control-Expose-Headers</code>. If OPTIONS is omitted, preflight is untested rather than passing.</p>
 </div>
 </div>
 <div class="btns"><button id="inspect-headers" class="primary" type="button">Diagnose pasted header data locally</button><button id="sample-headers" type="button">Load invented 402 + OPTIONS headers</button></div>
 <p id="offline-status" class="good status" role="status" aria-live="polite">No pasted headers have been analyzed. No background network request is made.</p>
 <div id="offline-results" hidden>
 <h3 id="offline-summary">—</h3>
+<p id="retry-summary" role="status" aria-live="polite">No paid-retry preflight analysis yet.</p>
 <div class="grid">
 <div><h3>Potential blockers</h3><ul id="offline-fail"></ul></div>
 <div><h3>Not independently established / recommendations</h3><ul id="offline-warn"></ul></div>
@@ -273,6 +283,7 @@ el("live-probe").addEventListener("click",async()=>{
 <li><strong>Excluded:</strong> production secret access, wallet signing, buyer-funded trial payment, facilitator settlement, Ethereum security audit, penetration testing, guaranteed client conversion, and chain or invoice certification. We do not infer paid settlement from an HTTP 402.</li>
 </ul>
 <p class="caption">This is a <strong>request to agree a contract</strong>, not authorization to charge. Buyers should provide no keys, cookies, private financial records or EIP-3009 signatures. An actual purchase requires separate written acceptance; if no agreement is reached the free tool remains available at 0 USDC. No paying buyer of this pilot is claimed.</p>
+<p><strong>Small self-service alternative:</strong> review the separate <a href="../services/x402-cors-remedy-150-usdc.html">active 1.50 Base USDC Soul.Markets CORS remediation listing</a> for one sanitized public OPTIONS / HTTP 402 assessment and a proposed fix. Payment is on the external provider only after the independent buyer elects to use that service. No payment occurs here, and no independent buyer of this SKU is claimed.</p>
 <div class="btns">
 <a class="btn primary" href="mailto:onecursor1@gmail.com?subject=15%20Base%20USDC%20x402%20Browser%20CORS%20QA%20Pilot%20%E2%80%94%20Scope%20Request&amp;body=I%20operate%20or%20am%20authorized%20to%20test%20this%20PUBLIC%20HTTPS%20endpoint%3A%0AOne%20browser%20Origin%3A%0AExpected%20paid%20method%20GET%20or%20POST%3A%0APublic%20error%20description%20(no%20credentials)%3A%0ARequested%20acceptance%20conditions%3A%0AProposed%20price%3A%2015%20USDC%20on%20Base%3B%20confirm%20written%20scope%2C%20payee%2C%20token%2C%20timeline%20and%20agreement%20before%20work%20or%20payment.%0ANo%20secrets%20or%20wallet%20signature%20enclosed.">Request the 15 USDC fixed-scope pilot ↗</a>
 <a class="btn" href="../services/x402-cors-remedy-150-usdc.html">Optional 1.50 USDC AI browser-CORS remedy ↗</a>

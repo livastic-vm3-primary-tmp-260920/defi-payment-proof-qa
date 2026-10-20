@@ -64,9 +64,10 @@ function parseHttpHeaders(raw){
 function originAllowed(raw,origin){
   return raw==="*"||raw===origin;
 }
-export function diagnoseCorsHeaders({challengeText,optionsText,origin,paidMethod="POST"}){
+export function diagnoseCorsHeaders({challengeText,optionsText,origin,paidMethod="POST",clientProfile="standard"}){
   const allowedOrigin=validateBrowserOrigin(origin);
   if(!["GET","POST"].includes(paidMethod))throw new Error("Select GET or POST paid method.");
+  if(!["standard","x402-fetch-2.28"].includes(clientProfile))throw new Error("Unknown browser client profile.");
   const chall=parseHttpHeaders(challengeText);
   const opt=optionsText?.trim()?parseHttpHeaders(optionsText):null;
   const errors=[],warnings=[],passes=[];
@@ -84,32 +85,44 @@ export function diagnoseCorsHeaders({challengeText,optionsText,origin,paidMethod
   if(!expose.has("payment-response")&&!expose.has("*"))
     warnings.push("SETTLEMENT_RESPONSE_NOT_EXPOSED");
   if(expose.has("*"))warnings.push("WILDCARD_EXPOSE_ONLY_WORKS_WITHOUT_CREDENTIALS");
-  let preflight=null;
+  let preflight=null,preflightDeclaredCompatible=null;
   if(opt){
     const ph=opt.headers;
     const is2xx=opt.status>=200&&opt.status<300;
     const method=tokenize(ph["access-control-allow-methods"]);
     const allowH=tokenize(ph["access-control-allow-headers"]);
-    const needs=["payment-signature","content-type"];
+    // @x402/fetch 2.28.0 injects a RESPONSE-only header into the paid REQUEST.
+    // Chrome therefore requires that header in the OPTIONS allow list too.
+    // Other SDK versions must be checked against their own actual request headers.
+    const needs=["payment-signature",...(paidMethod==="POST"?["content-type"]:[])];
+    if(clientProfile==="x402-fetch-2.28")needs.push("access-control-expose-headers");
+    const isAllowed=(name)=>allowH.has(name)||allowH.has("*");
     const preflightAllowed=originAllowed(ph["access-control-allow-origin"],allowedOrigin);
     if(!is2xx)errors.push("PREFLIGHT_NOT_2XX");
     if(!preflightAllowed)errors.push("PREFLIGHT_ORIGIN_NOT_ALLOWED");
     if(!method.has(paidMethod.toLowerCase())&&!method.has("*"))
       errors.push("PAID_METHOD_NOT_ALLOWED");
-    for(const field of needs)if(!allowH.has(field)&&!allowH.has("*"))
-      errors.push(field==="content-type"?"CONTENT_TYPE_NOT_ALLOWED":"PAYMENT_SIGNATURE_NOT_ALLOWED");
+    for(const field of needs)if(!isAllowed(field))
+      errors.push(field==="content-type"?"CONTENT_TYPE_NOT_ALLOWED":
+        field==="payment-signature"?"PAYMENT_SIGNATURE_NOT_ALLOWED":"SDK_228_REQUEST_EXPOSE_HEADER_NOT_ALLOWED");
+    if(clientProfile==="x402-fetch-2.28"&&isAllowed("access-control-expose-headers"))
+      passes.push("SDK_228_REQUEST_EXPOSE_HEADER_ALLOWED");
+    preflightDeclaredCompatible=is2xx&&preflightAllowed&&
+      (method.has(paidMethod.toLowerCase())||method.has("*"))&&needs.every(isAllowed);
     if(!ph["access-control-max-age"])warnings.push("PREFLIGHT_CACHE_NOT_ADVERTISED");
     if(allowH.has("*"))warnings.push("WILDCARD_REQUEST_HEADERS_REQUIRE_CREDENTIALS_OFF");
     preflight={
       status:opt.status,method:paidMethod,
       allowOrigin:preflightAllowed,allowMethod:method.has(paidMethod.toLowerCase())||method.has("*"),
       allowContentType:allowH.has("content-type")||allowH.has("*"),
-      allowPaymentSignature:allowH.has("payment-signature")||allowH.has("*"),
+      allowPaymentSignature:isAllowed("payment-signature"),
+      allowSdk228RequestExposeHeader:isAllowed("access-control-expose-headers"),
     };
   }else warnings.push("NO_OPTIONS_TRANSCRIPT");
   return {
     kind:"user-pasted_public_headers_not_network_authentication",
-    origin:allowedOrigin,method:paidMethod,challengeStatus:chall.status,
+    origin:allowedOrigin,method:paidMethod,clientProfile,challengeStatus:chall.status,
+    preflightDeclaredCompatible,
     challengeOriginAllowed:allowed,headerPresent:!!h["payment-required"],
     priceHeaderExposed:priceExposed,
     browserReadabilityDeclared:allowed&&priceExposed&&!!h["payment-required"]&&chall.status===402,

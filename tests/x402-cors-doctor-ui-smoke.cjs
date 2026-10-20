@@ -57,8 +57,22 @@ async function run(){
     assert.match(await page.locator("#challenge-paste").inputValue(),/PAYMENT-REQUIRED/);
     await page.locator("#inspect-headers").click();
     assert.equal(await page.locator("#offline-results").isHidden(),false);
-    assert.match(await page.locator("#offline-summary").innerText(),/declares a browser-visible unpaid/);
-    assert.equal(await page.locator("#offline-fail li").count(),0);checks++;
+    assert.match(await page.locator("#offline-summary").innerText(),/declares a browser-readable unpaid/);
+    assert.equal(await page.locator("#offline-fail li").count(),0);
+    assert.match(await page.locator("#retry-summary").innerText(),/required headers allowed/);checks++;
+    // Real browser DOM behavior, invented response headers only; no signed request or outside probe.
+    await page.locator("#client-profile").selectOption("x402-fetch-2.28");
+    await page.locator("#inspect-headers").click();
+    assert.match(await page.locator("#offline-fail").innerText(),/SDK 228 REQUEST EXPOSE HEADER NOT ALLOWED/);
+    assert.match(await page.locator("#retry-summary").innerText(),/PRE-FLIGHT BLOCKER/);
+    assert.equal(remoteRequests.length,0);checks++;
+    await page.locator("#options-paste").fill((await page.locator("#options-paste").inputValue())
+      .replace("PAYMENT-RESPONSE", "PAYMENT-RESPONSE,Access-Control-Expose-Headers"));
+    await page.locator("#inspect-headers").click();
+    assert.equal(await page.locator("#offline-fail li").count(),0);
+    assert.match(await page.locator("#retry-summary").innerText(),/required headers allowed/);
+    assert.equal(remoteRequests.length,0);checks++;
+    await page.locator("#client-profile").selectOption("standard");
     await page.locator("#options-paste").fill("HTTP/2 405\nAccess-Control-Allow-Origin: *\nAccess-Control-Allow-Methods: GET\nAccess-Control-Allow-Headers: content-type\n");
     await page.locator("#inspect-headers").click();
     assert.match(await page.locator("#offline-fail").innerText(),/PREFLIGHT NOT 2XX/);

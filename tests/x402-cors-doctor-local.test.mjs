@@ -196,3 +196,52 @@ test("browser origin must be literal scheme/host with no credentials or path",()
 test("paid method must be explicit expected GET or POST",()=>{
  assert.throws(()=>scan(quote,opts,{paidMethod:"DELETE"}),/GET or POST/);
 });
+
+
+test("measured @x402/fetch v2.28.0 retry exposes specific browser preflight blocker",()=>{
+ const minimal=scan();
+ assert.deepEqual(minimal.errors,[]);
+ assert.equal(minimal.preflightDeclaredCompatible,true);
+ const shipped=scan(quote,opts,{clientProfile:"x402-fetch-2.28"});
+ bad(shipped,"SDK_228_REQUEST_EXPOSE_HEADER_NOT_ALLOWED");
+ assert.equal(shipped.browserReadabilityDeclared,true);
+ assert.equal(shipped.preflightDeclaredCompatible,false);
+ assert.equal(shipped.paymentAuthorized,false);
+});
+test("SDK 2.28.0 extra request header allowed only when explicitly listed in OPTIONS",()=>{
+ const amended=opts.replace("Content-Type,PAYMENT-SIGNATURE,PAYMENT-RESPONSE","Content-Type,PAYMENT-SIGNATURE,PAYMENT-RESPONSE,Access-Control-Expose-Headers");
+ const r=scan(quote,amended,{clientProfile:"x402-fetch-2.28"});
+ assert.deepEqual(r.errors,[]);
+ assert.equal(r.preflightDeclaredCompatible,true);
+ assert.equal(r.preflight.allowSdk228RequestExposeHeader,true);
+ assert.ok(r.passes.includes("SDK_228_REQUEST_EXPOSE_HEADER_ALLOWED"));
+});
+test("HTTP GET signed retry does not inherently demand JSON content-type",()=>{
+ const noJson=opts.replace("Content-Type,PAYMENT-SIGNATURE,PAYMENT-RESPONSE","PAYMENT-SIGNATURE");
+ const r=scan(quote,noJson,{paidMethod:"GET"});
+ assert.deepEqual(r.errors,[]);
+ assert.equal(r.preflightDeclaredCompatible,true);
+ assert.equal(r.preflight.allowContentType,false);
+});
+test("SDK 2.28.0 GET retry still requires extra response-header name in preflight",()=>{
+ const noJson=opts.replace("Content-Type,PAYMENT-SIGNATURE,PAYMENT-RESPONSE","PAYMENT-SIGNATURE");
+ const blocked=scan(quote,noJson,{paidMethod:"GET",clientProfile:"x402-fetch-2.28"});
+ bad(blocked,"SDK_228_REQUEST_EXPOSE_HEADER_NOT_ALLOWED");
+ const fixed=scan(quote,noJson.replace("PAYMENT-SIGNATURE","PAYMENT-SIGNATURE,Access-Control-Expose-Headers"),{paidMethod:"GET",clientProfile:"x402-fetch-2.28"});
+ assert.deepEqual(fixed.errors,[]);
+ assert.equal(fixed.preflightDeclaredCompatible,true);
+});
+test("no OPTIONS means SDK variant paid retry unknown, not buyer success",()=>{
+ const r=scan(quote,"",{clientProfile:"x402-fetch-2.28"});
+ assert.equal(r.browserReadabilityDeclared,true);
+ assert.equal(r.preflightDeclaredCompatible,null);
+ assert.ok(r.warnings.includes("NO_OPTIONS_TRANSCRIPT"));
+});
+test("unrecognized SDK profile must not silently imply compatibility",()=>{
+ assert.throws(()=>scan(quote,opts,{clientProfile:"x402-fetch-future"}),/client profile/);
+});
+test("OPTIONS allowed profile cannot override a failing method or origin",()=>{
+ const q=scan(quote,opts.replace("GET,POST,OPTIONS","GET,OPTIONS"),{clientProfile:"x402-fetch-2.28"});
+ assert.equal(q.preflightDeclaredCompatible,false);
+ bad(q,"PAID_METHOD_NOT_ALLOWED");
+});
