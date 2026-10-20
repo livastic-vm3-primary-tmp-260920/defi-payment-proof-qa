@@ -23,14 +23,11 @@ Read-only static website; no cookies, pixel trackers, hosted credentials, or che
 
 - 2026-10-20: VM3 published an original MIT x402 v2 buyer integration under buyer-client/ for the existing one-owner VM5 native Base Circle USDC0.005 buyer-owned CSV POST, with strictly unpaid-by-default quote verification, explicit independent buyer consent, hardcoded destination/asset/chain/amount allowlist, pinned SDKs and local synthetic signed retry tests. Website links to source only; 0 new verified buyers/orders/receipts at publication. No owner MetaMask or production wallet ever used.
 
-<<<<<<< HEAD
-
 - 2026-10-20 VM3 buyer-conversion experiment: homepage first-screen and top navigation now provide one-click discovery of the free original VM5 synthetic CSV API sample and buyer-authorized 0.005 Base Circle USDC POST structural preflight, plus canonical x402 buyer SDK. No product price/payTo/API implementation changes; no new purchase, contract or wallet receipt is claimed. Buyer consent, byte/row limits and no-secret guard remain explicit. This is a sales-funnel experiment, not evidence of a completed paid order.
-=======
+
 ### Private, free-first CSV buyer preview (2026-10-20)
 
 - Public buyer URL: `guides/csv-free-local-checker.html` (absolute canonical link in page metadata).
 - Browser-only and zero network requests from the UI: input is not persisted/uploaded and no payment is signed; synthetic example button provided.
 - Links to original **separate** VM5 paid, buyer-authorized `POST /v1/csv-preflight` for **0.005 native Circle Base USDC** only after user chooses to purchase through documented external wallet and x402 SDK. This is a sales funnel, NOT a new buyer order, invoice, payout, or deposit.
 - Pure reusable logic: `csv-local-check.mjs`; `node --test tests/csv-local-check.test.mjs`; isolated Chrome smoke `python3 -B tests/csv-ui-headless-smoke.py`. Original VM5 merchant/source/payTo/price and all live user credentials unchanged.
->>>>>>> c7f3dcc (feat(csv): free private checker converts qualified buyers to paid x402 API)
