@@ -7,6 +7,7 @@ const home=read("../index.html");
 const sitemap=read("../sitemap.xml");
 const agent=read("../llms.txt");
 const script=read("../usdc-ledger-local.mjs");
+const decoder=read("../usdc-receipt-json-local.mjs");
 const route="guides/base-usdc-merchant-ledger.html";
 test("real website discovers the new local USDC merchant product from homepage and sitemap",()=>{
   for(const doc of [home,sitemap,agent])
@@ -23,7 +24,7 @@ test("browser-only tooling has no network, signer, storage or analytics executio
   assert.match(landing,/import \{[\s\S]*analyzeUsdcLedger/);
   assert.match(landing,/type="module"/);
   assert.doesNotMatch(landing,/<script\s+src=|<iframe|<form|<object/i);
-  for(const txt of [landing,script]) {
+  for(const txt of [landing,script,decoder]) {
     assert.doesNotMatch(txt,/\bfetch\s*\(|\bXMLHttpRequest\b|sendBeacon\s*\(|\bWebSocket\s*\(|localStorage|sessionStorage|window\.ethereum|ethereum\.request|walletconnect/i);
   }
 });
@@ -31,6 +32,22 @@ test("buyer can run, inspect, export and clear without a mandatory upload or onc
   for(const id of ["wallet","csv","csv-file","run","sample","clear","report","export","claimed-usdc","claimed-count","review-count","findings-body"]) assert.ok(landing.includes('id="'+id+'"'));
   assert.match(landing,/No chain nodes were queried/);
   assert.match(landing,/No network call, file upload, payment, wallet signature or persistence/);
+});
+test("receipt JSON paste lowers input friction but never authenticates an onchain receipt",()=>{
+ for(const id of ["receipt-json","receipt-import","receipt-sample","receipt-status"])
+   assert.ok(landing.includes('id="'+id+'"'));
+ assert.match(landing,/eth_getTransactionReceipt/);
+ assert.match(landing,/Every imported delivery_status is unknown/);
+ assert.match(landing,/The tool cannot authenticate pasted data/);
+ assert.match(decoder,/settlementVerified:false/);
+ assert.match(decoder,/chainVerified:false/);
+});
+test("receipt JSON parsing remains bounded local-only, without external resources",()=>{
+ assert.match(decoder,/RECEIPT_JSON_MAX_BYTES = 102400/);
+ assert.match(decoder,/USDC Transfer/);
+ assert.match(decoder,/chain ID does not match Base 8453/);
+ assert.match(decoder,/networkRequests:0/);
+ assert.match(landing,/No RPC calls/);
 });
 test("paid scope is a separate honest opt-in route to established one-owner seller identity",()=>{
   assert.match(landing,/5 USDC for one public transfer/);

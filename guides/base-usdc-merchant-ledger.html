@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#0b1826">
 <meta name="robots" content="index,follow">
-<meta name="description" content="Free private Base USDC seller CSV reconciliation: spot duplicate txHash:logIndex events, wrong tokens, wrong recipients, and payment-versus-delivery claims. No file upload, wallet connection, fee or registration.">
+<meta name="description" content="Free browser-only Base USDC seller reconciliation. Paste transfer CSV or untrusted eth_getTransactionReceipt JSON locally; flag duplicate event IDs, wrong token/payee and delivery claims. No upload, login or wallet signature.">
 <link rel="canonical" href="https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/base-usdc-merchant-ledger.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Base USDC Seller Ledger — Free Local Duplicate & Delivery Checker">
-<meta property="og:description" content="Find duplicated or mismatched Base USDC payment claims in a CSV locally. Export a review report without uploading your wallet data.">
+<meta property="og:description" content="Paste public Base USDC Transfer-log receipt JSON, convert to unverified CSV locally, spot duplicate event keys and delivery exceptions, then download a private review report.">
 <title>Free Base USDC Seller Ledger | CSV Duplicate Events & Delivery Exceptions</title>
 <style>
 :root{color-scheme:dark;--bg:#0b1421;--panel:#14283b;--panel2:#0f2335;--line:#375368;--mint:#9af0c4;--blue:#a7d9fa;--amber:#f7cf86;--ink:#f4f8ff;--muted:#becfdf}
@@ -88,9 +88,16 @@ import {
   analyzeUsdcLedger,exportUsdcReviewCsv,SYNTHETIC_WALLET,SYNTHETIC_INPUT,
   MAX_BYTES,MAX_DATA_ROWS,
 } from "../usdc-ledger-local.mjs";
+import {parseBaseUsdcReceiptToCsv, ERC20_TRANSFER_TOPIC} from "../usdc-receipt-json-local.mjs";
+import {BASE_CIRCLE_USDC} from "../usdc-ledger-local.mjs";
 const el=id=>document.getElementById(id);
 const csv=el("csv"),wallet=el("wallet"),status=el("status"),reportBox=el("report"),fileInput=el("csv-file");
 const count=el("counts"),tableBody=el("findings-body");
+const rawReceipt=el("receipt-json"), rawReceiptStatus=el("receipt-status");
+function rawMessage(s,warning=false){
+  rawReceiptStatus.textContent=s;
+  rawReceiptStatus.classList.toggle("warning",warning);
+}
 let report=null;
 function message(s,warning=false){status.textContent=s;status.classList.toggle("warning",warning);}
 function reset(){
@@ -116,6 +123,39 @@ function render(result){
   el("truncated").hidden=result.records.length<=80;
   message("Local analysis complete. No network call, file upload, payment, wallet signature or persistence.");
 }
+el("receipt-sample").addEventListener("click",()=>{
+  reset();csv.value="";fileInput.value="";
+  const hash="0x"+"a".repeat(64),f="0x"+"2".repeat(40),t=SYNTHETIC_WALLET;
+  const demo={
+    jsonrpc:"2.0",id:1,result:{
+      transactionHash:hash,blockHash:"0x"+"b".repeat(64),blockNumber:"0x98",status:"0x1",
+      logs:[{
+        address:BASE_CIRCLE_USDC,
+        topics:[ERC20_TRANSFER_TOPIC,"0x"+"0".repeat(24)+f.slice(2),"0x"+"0".repeat(24)+t.slice(2)],
+        data:"0x"+(5000n).toString(16).padStart(64,"0"),
+        logIndex:"0xc",transactionHash:hash,removed:false,
+      }]
+    }
+  };
+  wallet.value=SYNTHETIC_WALLET;
+  rawReceipt.value=JSON.stringify(demo,null,2);
+  rawMessage("Invented receipt JSON loaded. It is not an actual blockchain event or proof of delivery.");
+  rawReceipt.focus();
+});
+el("receipt-import").addEventListener("click",()=>{
+  reset();csv.value="";fileInput.value="";
+  try{
+    const out=parseBaseUsdcReceiptToCsv(rawReceipt.value);
+    csv.value=out.csv;
+    rawMessage("Imported "+out.rowsImported+" claimed USDC Transfer log(s). "+
+      out.nonUsdcOrNonTransferLogsSkipped+" other log(s) skipped; "+out.removedLogsSkipped+
+      " removed log(s) excluded. Every delivery_status is unknown. "+
+      "You must verify provenance and delivery independently before changing that column.");
+    csv.focus();
+  }catch(e){
+    rawMessage("Could not import pasted JSON: "+String(e?.message||e),true);
+  }
+});
 el("run").addEventListener("click",()=>{
   reset();
   try{render(analyzeUsdcLedger(csv.value,wallet.value));}
@@ -126,7 +166,8 @@ el("sample").addEventListener("click",()=>{
   message("Invented demonstration data loaded. Click 'Check local claims'. No real payment is represented.");csv.focus();
 });
 el("clear").addEventListener("click",()=>{
-  reset();wallet.value="";csv.value="";fileInput.value="";
+  reset();wallet.value="";csv.value="";fileInput.value="";rawReceipt.value="";
+  rawMessage("Pasted receipt JSON cleared from this browser tab.");
   message("The input was cleared from this page. No data was saved or uploaded.");wallet.focus();
 });
 fileInput.addEventListener("change",async()=>{
@@ -164,6 +205,19 @@ el("limits").textContent="Up to "+MAX_DATA_ROWS+" CSV data rows and "+(MAX_BYTES
 <p class="lead">Paste your x402 seller or merchant transfer CSV. Spot duplicate transaction log IDs, the wrong USDC contract or destination, self-transfers, and deliveries that do not match the claimed transfer record. Your wallet address and CSV stay in this browser.</p>
 <p class="limits"><strong>Important:</strong> A CSV is a claim, not a chain receipt. This tool does <strong>not</strong> connect to Base RPC, verify transaction finality, authorize a payment or prove taxable/realized revenue. Treat the subtotal only as an <strong>unverified candidate</strong> requiring independent chain and delivery evidence.</p>
 </header>
+<section id="receipt-converter" class="card" aria-labelledby="receipt-converter-title">
+<p class="kicker">Optional zero-upload helper · No RPC calls</p>
+<h2 id="receipt-converter-title">Have a public transaction receipt JSON, not a CSV?</h2>
+<p class="muted">Paste the JSON text from a <code>eth_getTransactionReceipt</code> response you obtained independently. We extract only structurally valid canonical Circle USDC ERC-20 Transfer logs into the CSV below, including the exact transaction hash and <code>logIndex</code>. We never contact a chain, fetch a receipt, or verify the claimed Base network, transaction authenticity, confirmations, recipient ownership, payment authorization or delivery. <strong>Every imported delivery_status is unknown</strong> until you independently check your own order records.</p>
+<label for="receipt-json">Public Base receipt JSON (up to 100 KiB; no credentials)</label>
+<textarea id="receipt-json" style="min-height:160px" spellcheck="false" aria-describedby="receipt-warning" placeholder='{"result":{"transactionHash":"0x...","status":"0x1","blockHash":"0x...","blockNumber":"0x...","logs":[{"address":"0x8335...","topics":["0xddf252...","0x...","0x..."],"data":"0x...","logIndex":"0x0"}]}}'></textarea>
+<p id="receipt-warning" class="caption">Use a published transaction receipt from a source you trust, after verifying it describes <strong>Base mainnet 8453</strong>. Never paste private keys, payment signatures, authentication headers, cookies or invoices. The tool cannot authenticate pasted data. Imported amounts are structurally decoded USDC micro units but are not independently verified.</p>
+<div class="buttons">
+<button type="button" class="btn primary" id="receipt-import">Import Transfer logs to CSV (local)</button>
+<button type="button" class="btn" id="receipt-sample">Load invented receipt JSON</button>
+</div>
+<p id="receipt-status" role="status" class="safe">No JSON receipt imported. Try the synthetic example; a valid event only becomes an unverified CSV claim.</p>
+</section>
 <div class="grid">
 <section class="card" aria-labelledby="input-title" style="margin-top:0">
 <h2 id="input-title">1. Check your own CSV locally</h2>
