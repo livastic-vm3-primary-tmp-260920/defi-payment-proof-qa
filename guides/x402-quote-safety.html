@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#0e1727">
+<meta name="description" content="Free local x402 Payment-Required quote inspector. Check Base USDC price, recipient, chain and asset before deciding whether to sign a wallet payment. Try a real unpaid HTTP 402 challenge. No wallet, payment, account or pasted-data upload.">
+<link rel="canonical" href="https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/x402-quote-safety.html">
+<title>Free x402 Payment Quote Inspector | Check Base USDC Price Before Signing</title>
+<meta property="og:title" content="Know the USDC price and pay-to wallet before signing an x402 request">
+<meta property="og:description" content="A free, accountless, walletless local x402 payment-quote checklist and live unpaid 402 demonstration.">
+<style>
+:root{color-scheme:dark;--bg:#0c1422;--panel:#17243a;--panel2:#132033;--border:#334762;--ink:#f4f8fc;--muted:#b8c9d9;--mint:#90edc5;--warn:#ffe0a1;--red:#ffc1b7}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:1100px;margin:auto;padding:18px 24px 72px}
+nav{font-size:.89rem;padding:14px 0 26px;color:var(--muted)}
+a{color:var(--mint);text-underline-offset:3px}a:focus-visible,textarea:focus-visible,input:focus-visible,button:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.eyebrow{color:var(--mint);font-weight:800;text-transform:uppercase;letter-spacing:.12em;font-size:.78rem}
+h1{font-size:clamp(2.35rem,5vw,4.5rem);letter-spacing:-.055em;line-height:1.07;margin:14px 0 24px}
+h1 span{color:var(--mint)}h2{font-size:clamp(1.4rem,2.7vw,2rem);line-height:1.23;letter-spacing:-.025em;margin:27px 0 15px}
+h3{font-size:1.12rem;margin:0 0 9px}p{margin:10px 0}.lead{font-size:1.14rem;color:var(--muted);max-width:840px}
+.card{background:var(--panel);border:1px solid var(--border);padding:22px;border-radius:16px;margin:18px 0}
+.soft{background:var(--panel2)}label{display:block;font-weight:720;margin:11px 0 7px}
+textarea,input{width:100%;color:var(--ink);background:#080f1b;border:1px solid #778aa2;border-radius:10px;padding:11px 13px;font:14px/1.58 ui-monospace,Consolas,monospace}
+textarea{min-height:165px;resize:vertical}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px}
+button,.action{border:1px solid var(--mint);background:var(--mint);border-radius:9px;color:#08241a;cursor:pointer;padding:12px 17px;font:700 15px/1.4 system-ui,sans-serif;text-decoration:none;display:inline-flex;justify-content:center;align-items:center}
+button.alt{background:transparent;color:var(--mint)}
+button:disabled{opacity:.48;cursor:not-allowed}
+.fine{font-size:.87rem;color:var(--muted)}
+#summary{font-size:1rem;font-weight:700}
+#summary[data-status="review"]{color:var(--warn)}
+#summary[data-status="plain"]{color:var(--mint)}
+#summary[data-status="error"]{color:var(--red)}
+.quote{padding:18px;border:1px solid var(--border);border-radius:13px;background:#0f192b;margin:16px 0}
+dl{display:grid;grid-template-columns:minmax(125px,.32fr) minmax(0,1fr);column-gap:15px;row-gap:8px;font-size:.91rem}
+dt{color:var(--muted)}dd{margin:0;overflow-wrap:anywhere;font-family:ui-monospace,Consolas,monospace}
+.flag{font-size:.87rem;padding:7px 10px;margin:7px 0;border-left:3px solid var(--warn);background:#202c42;color:var(--warn)}
+.flag.mismatch{border-color:var(--red);color:var(--red)}
+.warning{border-left:3px solid var(--warn);background:#272633;padding:14px 18px;border-radius:0 10px 10px 0;color:#ffebc8}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.step{border:1px solid var(--border);border-radius:12px;padding:16px;background:var(--panel)}
+.step strong{color:var(--mint)}
+code{color:var(--mint);background:#0c182b;border-radius:3px;padding:2px 5px;font:13px ui-monospace,Consolas,monospace;overflow-wrap:anywhere}
+footer{color:var(--muted);border-top:1px solid var(--border);padding-top:22px;margin-top:42px;font-size:.87rem}
+@media(max-width:760px){.fields,.steps{grid-template-columns:1fr}main{padding:12px 16px 50px}.card{padding:17px}dl{grid-template-columns:1fr;row-gap:2px}dt{margin-top:12px}h1{font-size:clamp(2rem,8vw,3.2rem)}}
+</style>
+</head>
+<body>
+<main>
+<nav><a href="../">VM3 Payment / QA</a> / Free x402 price preview</nav>
+<div class="eyebrow">Read-only preview · Circle USDC on Base · No account or wallet</div>
+<h1>Know the price <span>before</span> the payment signature.</h1>
+<p class="lead">An x402 request can ask a wallet to authorize an onchain payment. Before signing anything, inspect the quoted chain, native USDC contract, atomic amount, destination address and exact resource. The checks run in your browser on the quote you supply, not on your wallet.</p>
+<div class="steps" aria-label="How the free inspector works">
+<div class="step"><strong>1. Inspect without buying</strong><p>A paid API can respond with <code>402</code> and a <code>PAYMENT-REQUIRED</code> header.</p></div>
+<div class="step"><strong>2. Compare facts</strong><p>Paste the header or click the real read-only demo. Optionally provide the payee and maximum price you expected.</p></div>
+<div class="step"><strong>3. Decide independently</strong><p>Review the findings before using your own approved payment client. This page never signs, pays or approves tokens.</p></div>
+</div>
+<section class="card" aria-labelledby="inspect-heading">
+<h2 id="inspect-heading">Inspect a payment challenge</h2>
+<p class="fine">Accepts JSON or the <code>PAYMENT-REQUIRED</code> Base64 header for x402 v1/v2. Paste <strong>only the public unsigned 402 quote</strong>—never a payment signature, recovery phrase, wallet private key, token, or authenticated request. Pasted data never leaves this tab.</p>
+<label for="quote">Public x402 payment terms</label>
+<textarea id="quote" spellcheck="false" autocomplete="off" aria-label="Unsigned x402 PAYMENT-REQUIRED header or JSON" placeholder="Paste the public PAYMENT-REQUIRED header or quote JSON here. Do not paste signed payment payloads."></textarea>
+<div class="fields">
+<div><label for="expected-recipient">Expected recipient (optional)</label><input id="expected-recipient" autocomplete="off" spellcheck="false" placeholder="0x…40 hex characters" maxlength="100"></div>
+<div><label for="max-price">Your maximum Base USDC price (optional)</label><input id="max-price" inputmode="decimal" autocomplete="off" placeholder="e.g. 0.005" maxlength="28"></div>
+<div style="grid-column:1/-1"><label for="expected-resource">Expected HTTPS resource URL (optional)</label><input id="expected-resource" autocomplete="off" spellcheck="false" placeholder="https://example.com/api/paid-resource" maxlength="600"></div>
+</div>
+<p class="row">
+<button type="button" id="inspect">Inspect quote locally →</button>
+<button type="button" id="demo" class="alt">Read a real unpaid 402 quote ↗</button>
+<button type="button" id="clear" class="alt">Clear</button>
+</p>
+<p class="fine">The live example button makes <strong>one unsigned GET</strong> to our existing same-owner VM5 merchant's 0.005-USDC example route, reads the CORS-exposed payment header and does <strong>not</strong> use a wallet, signature, callback, purchase, payment facilitator or transaction. The example can be unavailable if the provider is down.</p>
+</section>
+<section class="card" id="results" aria-label="Payment quote review results">
+<h2>Buyer checklist</h2>
+<p id="summary" role="status" aria-live="polite">No quote inspected. Paste public terms or load the real unsigned example.</p>
+<div id="entries"></div>
+<p class="warning"><strong>Important:</strong> Even an exact match here cannot authenticate the sender, prove address ownership, audit a token, guarantee payment settlement or prove delivery. A pasted JSON response can be forged. Verify the endpoint and merchant independently. Never use this tool as a green light to sign.</p>
+</section>
+<section class="card soft" aria-labelledby="paid-heading">
+<div class="eyebrow">Buyer-led paid services · Existing merchant, one human owner</div>
+<h2 id="paid-heading">Need the result, not just a quote?</h2>
+<p>For agents importing spreadsheets, our existing merchant also operates a <strong>0.005 native Circle Base USDC</strong> paid CSV structural preflight (<code>POST /v1/csv-preflight</code>, on your own authorized CSV). A separate paid demonstration report (<code>GET /v1/csv-report</code>) checks invented CSV data. Those endpoints require the buyer's independent x402 authorization; this free quote preview is not a checkout.</p>
+<p class="row"><a class="action" href="csv-structural-preflight-005-base-usdc.html">View the real CSV API + buyer SDK ↗</a> <a class="action" href="../services/public-web-qa-19-usdc.html">Ask about manual-scoped web QA ↗</a></p>
+<p class="fine">The live free demo is a price quote only: <strong>no paid customer-input CSV POST order is claimed</strong>. The same one-owner team operates VM3 documentation and VM5 merchant. Original test code is publicly inspectable; refunds and acceptance depend on the actual agreed provider service.</p>
+</section>
+<h2>What is and is not checked</h2>
+<p class="fine">Locally checks supported x402 protocol shapes, Base mainnet <code>eip155:8453</code>, the official native USDC contract <code>0x833589…2913</code>, integer amount conversion with six USDC decimals, merchant pay-to address structure, expected-recipient/price/resource comparisons, HTTPS resource and timeout shape. Other chains and token decimal systems are clearly marked unsupported. Does <strong>not</strong> call chain RPC, inspect signed authorizations, scan a private site, connect MetaMask, validate wallet ownership, perform custody, trade, swap, create a paid API order, or infer buyer revenue.</p>
+<p class="fine">Source and reproducible tests: <a href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/blob/main/x402-quote-safety.mjs">independently authored pure JavaScript inspector</a> and <a href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/blob/main/tests/x402-quote-safety.test.mjs">offline regression checks</a>. General protocol reference: <a href="https://github.com/x402-foundation/x402/blob/main/docs/introduction.md">x402 Foundation</a>.</p>
+<footer>Original, independent AI-assisted work; one ultimate human economic owner. This website does not imply paid customer orders, authenticated merchants, guaranteed 402 compatibility or ownership of external contracts. Public unsigned quote data only.</footer>
+</main>
+<script type="module">
+import {inspectQuote,LIVE_EXAMPLE_ENDPOINT} from "../x402-quote-safety.mjs";
+const field=document.getElementById("quote");
+const recipient=document.getElementById("expected-recipient");
+const maxPrice=document.getElementById("max-price");
+const expectedUrl=document.getElementById("expected-resource");
+const summary=document.getElementById("summary");
+const entries=document.getElementById("entries");
+const demo=document.getElementById("demo");
+const el=(tag,text,cls)=>{
+  const node=document.createElement(tag);
+  if(text!==undefined)node.textContent=String(text);
+  if(cls)node.className=cls;
+  return node;
+};
+function draw(report){
+  entries.replaceChildren();
+  summary.dataset.status=report.hasReview?"review":"plain";
+  summary.textContent="Parsed "+report.entries.length+" x402 v"+report.x402Version+" payment option(s). "+(report.hasMismatch?"Some quote terms conflict with your expectations.":report.hasReview?"Review warning(s) below.":"No structural mismatch found; NOT merchant-authenticated or approved for payment.");
+  for(const opt of report.entries){
+    const outer=el("div",undefined,"quote");
+    outer.append(el("h3","Option "+opt.index+": "+opt.displayPrice));
+    const dl=el("dl");
+    for(const [name,value] of [
+      ["Scheme",opt.scheme],["Chain",opt.network],["Asset contract",opt.asset],
+      ["Atomic amount",opt.atomicAmount],["Pay-to address",opt.payTo],
+      ["Resource",opt.resource || "(not supplied)"]
+    ]){
+      dl.append(el("dt",name),el("dd",value||"(missing)"));
+    }
+    outer.append(dl);
+    if(!opt.issues.length)outer.append(el("p","No warning from these limited local shape checks. It does not authenticate the merchant, payer or transaction.","fine"));
+    for(const issue of opt.issues)outer.append(el("div",issue.code+": "+issue.message,"flag"+(issue.type==="mismatch"?" mismatch":"")));
+    entries.append(outer);
+  }
+}
+document.getElementById("inspect").addEventListener("click",()=>{
+  try{
+    const r=inspectQuote(field.value,{
+      payTo:recipient.value.trim(),
+      maxUsdc:maxPrice.value.trim(),
+      resourceUrl:expectedUrl.value.trim()
+    });
+    draw(r);
+  }catch(error){
+    entries.replaceChildren();
+    summary.dataset.status="error";
+    summary.textContent=error instanceof Error ? error.message : "Unable to inspect quote";
+  }
+});
+document.getElementById("clear").addEventListener("click",()=>{
+  field.value="";recipient.value="";maxPrice.value="";expectedUrl.value="";
+  entries.replaceChildren();
+  summary.dataset.status="";
+  summary.textContent="Cleared. No pasted quote, signature, private key or personal data is retained by this page.";
+});
+demo.addEventListener("click",async()=>{
+  demo.disabled=true;
+  summary.dataset.status="";
+  summary.textContent="Requesting one unsigned 402 quote from the existing merchant; no payment or wallet access…";
+  entries.replaceChildren();
+  const control=new AbortController();
+  const timeout=setTimeout(()=>control.abort(),12000);
+  try{
+    const response=await fetch(LIVE_EXAMPLE_ENDPOINT,{
+      method:"GET",mode:"cors",credentials:"omit",redirect:"error",cache:"no-store",
+      headers:{Accept:"application/json"},signal:control.signal
+    });
+    if(response.status!==402)throw new Error("Public merchant returned HTTP "+response.status+" instead of an unpaid 402 quote.");
+    const header=response.headers.get("PAYMENT-REQUIRED");
+    if(!header)throw new Error("HTTP 402 lacked a browser-readable PAYMENT-REQUIRED header.");
+    field.value="PAYMENT-REQUIRED: "+header;
+    expectedUrl.value=LIVE_EXAMPLE_ENDPOINT;
+    document.getElementById("inspect").click();
+  }catch(err){
+    summary.dataset.status="error";
+    summary.textContent="No verified live quote right now: "+(err instanceof Error?err.message:"request failed")+". No payment was attempted.";
+  }finally{
+    clearTimeout(timeout);demo.disabled=false;
+  }
+});
+</script>
+</body></html>
