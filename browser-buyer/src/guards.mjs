@@ -87,6 +87,17 @@ export function guardTypedData(p,connectedAddress,nowSeconds=Math.floor(Date.now
  if(deadline===null||deadline<=now||deadline>now+3600n)deny("Payment authorization expiration invalid");
  return true;
 }
+/**
+ * The v2 fetch SDK incorrectly injects Access-Control-Expose-Headers as a
+ * REQUEST header (it is designed as a RESPONSE header). VM5's CORS allowlist
+ * intentionally excludes it, so delete that one unnecessary request header.
+ * Never remove or modify the actual PAYMENT-SIGNATURE authorization.
+ */
+export function allowedBrowserTransportHeaders(input,init={}) {
+ const headers=new Headers(input instanceof Request ? input.headers : init.headers);
+ headers.delete("Access-Control-Expose-Headers");
+ return headers;
+}
 export function makeInjectedBuyerSigner({provider,address,signTypedData}) {
  if(!provider||typeof provider.request!=="function"||typeof signTypedData!=="function"||!addr(address))deny("No valid injected buyer wallet");
  let signed=0;

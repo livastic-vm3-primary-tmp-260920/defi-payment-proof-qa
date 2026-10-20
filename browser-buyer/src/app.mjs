@@ -5,7 +5,7 @@ import {registerExactEvmScheme} from "@x402/evm/exact/client";
 import {wrapFetchWithPayment} from "@x402/fetch";
 import {
   RESOURCE,PAYTO,ASSET,PRICE,NETWORK,validateCsv,requestBody,checkQuote,
-  guardOutgoing,makeInjectedBuyerSigner
+  guardOutgoing,allowedBrowserTransportHeaders,makeInjectedBuyerSigner
 } from "./guards.mjs";
 
 /**
@@ -114,7 +114,8 @@ payBtn.addEventListener("click",async()=>{
     if(networkCount!==2||signatureCount||signer.getSignCount()!==1)throw new Error("BLOCK: Unexpected signed retry");
     signatureCount=1;
    }else if(networkCount!==1)throw new Error("BLOCK: Missing authorization on the second request");
-   const resp=await fetch(input,{...init,mode:"cors",credentials:"omit",redirect:"error",cache:"no-store",signal:AbortSignal.timeout(25000)});
+   const safeHeaders=allowedBrowserTransportHeaders(input,init);
+   const resp=await fetch(input,{...init,headers:safeHeaders,mode:"cors",credentials:"omit",redirect:"error",cache:"no-store",signal:AbortSignal.timeout(25000)});
    if(resp.status===402)checkQuote(resp.headers.get("PAYMENT-REQUIRED"));
    return resp;
   }

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {checkQuote,guardTypedData,makeInjectedBuyerSigner,guardOutgoing,requestBody,validateCsv,RESOURCE,PAYTO,ASSET} from "../src/guards.mjs";
+import {checkQuote,guardTypedData,makeInjectedBuyerSigner,guardOutgoing,allowedBrowserTransportHeaders,requestBody,validateCsv,RESOURCE,PAYTO,ASSET} from "../src/guards.mjs";
 const buyer="0x1111111111111111111111111111111111111111";
 const quote={x402Version:2,resource:{url:RESOURCE},accepts:[{scheme:"exact",network:"eip155:8453",asset:ASSET,amount:"5000",payTo:PAYTO,maxTimeoutSeconds:300,extra:{name:"USD Coin",version:"2"}}]};
 const header=v=>Buffer.from(JSON.stringify(v)).toString("base64");
@@ -65,4 +65,12 @@ test("malicious first typed signing request never calls provider signer",async()
  const p=typed();p.message.to="0x"+"3".repeat(40);
  await assert.rejects(()=>s.signTypedData(p),/BLOCK/);
  assert.equal(calls,0);
+});
+
+test("browser transport removes only invalid response-only request header, never signature",()=>{
+ const req=new Request(RESOURCE,{method:"POST",body:"{}",headers:{"Content-Type":"application/json","PAYMENT-SIGNATURE":"v2-public-test-signature","Access-Control-Expose-Headers":"PAYMENT-RESPONSE"}});
+ const headers=allowedBrowserTransportHeaders(req);
+ assert.equal(headers.has("access-control-expose-headers"),false);
+ assert.equal(headers.get("PAYMENT-SIGNATURE"),"v2-public-test-signature");
+ assert.equal(headers.get("Content-Type"),"application/json");
 });

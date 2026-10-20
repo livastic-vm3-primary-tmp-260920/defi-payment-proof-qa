@@ -33,3 +33,8 @@ test("unsafe nonfinal payment is explicitly treated as unknown not final",()=>{
  assert.match(text,/not an independently finalized blockchain receipt/);
  assert.match(text,/payment may have settled/);
 });
+
+test("signed browser request strips only the CORS-incompatible response-only header",()=>{
+ assert.match(text,/allowedBrowserTransportHeaders/);
+ assert.match(text,/headers:safeHeaders/);
+});
