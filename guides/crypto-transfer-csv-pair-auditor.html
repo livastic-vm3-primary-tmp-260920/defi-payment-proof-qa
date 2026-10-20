@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index,follow"><meta name="theme-color" content="#071622">
+<meta name="description" content="Free browser-local crypto wallet and exchange transfer CSV candidate matcher. Compare outgoing and incoming amounts, tx hashes, timezones and fees without uploading data or connecting a wallet. Not tax advice.">
+<link rel="canonical" href="https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/crypto-transfer-csv-pair-auditor.html">
+<title>Free Crypto Wallet ↔ Exchange Transfer CSV Pair Checker</title>
+<style>
+:root{color-scheme:dark;--bg:#091623;--p:#152739;--edge:#34506b;--ink:#f6f8fc;--a:#92ecc2;--m:#bbccdd;--warn:#ffdeaa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,Arial,sans-serif}
+main{max-width:1080px;margin:auto;padding:18px 22px 70px}nav{padding:15px 0;color:var(--m);font-size:14px}
+a{color:var(--a);text-underline-offset:3px}h1{font-size:clamp(2.2rem,5vw,3.8rem);line-height:1.13;letter-spacing:-.05em}h2{font-size:1.55rem;margin:18px 0}
+p,li{color:var(--m)}.lead{font-size:1.12rem}.eyebrow{font-size:13px;color:var(--a);font-weight:800;text-transform:uppercase;letter-spacing:.1em}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:17px}.card{background:var(--p);border:1px solid var(--edge);border-radius:13px;padding:20px;margin:16px 0}
+textarea{width:100%;height:210px;resize:vertical;background:#07121e;color:var(--ink);border:1px solid #7a91a9;padding:13px;border-radius:9px;font:13px/1.5 ui-monospace,Consolas,monospace}
+button,.button{display:inline-block;background:var(--a);color:#08241b;border:1px solid var(--a);border-radius:9px;padding:12px 17px;font:750 15px system-ui;text-decoration:none;cursor:pointer}
+button.alt{background:transparent;color:var(--a)}button:disabled{opacity:.5}button:focus-visible,a:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--warn);outline-offset:3px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:18px 0}.small{font-size:13px;color:var(--m)}
+input[type=number]{width:95px;background:#091623;color:var(--ink);border:1px solid #7a91a9;padding:10px;border-radius:9px}
+#summary{font-weight:750;white-space:pre-wrap}#summary[data-warning=true]{color:var(--warn)}
+#details{max-height:380px;overflow:auto;padding-left:22px}#details li{padding:8px 0;border-bottom:1px solid var(--edge);overflow-wrap:anywhere}
+.warn{border-left:3px solid var(--warn);padding:13px;background:#2a2731;color:var(--warn)}
+code{background:#0e2235;border-radius:4px;padding:2px 4px;font:13px ui-monospace,Consolas,monospace}footer{border-top:1px solid var(--edge);margin-top:40px;padding-top:20px;color:var(--m);font-size:13px}
+@media(max-width:720px){main{padding:14px 15px 55px}.grid{grid-template-columns:1fr}.card{padding:15px}}
+</style>
+</head><body><main>
+<nav><a href="../">One Cursor / Payment QA</a> / Free CSV transfer discrepancy preview</nav>
+<p class="eyebrow">Based on recurring crypto-user CSV reconciliation complaints · Free & private</p>
+<h1>Did a wallet transfer turn into a mysterious “sale”?</h1>
+<p class="lead">Put withdrawal and deposit rows side-by-side. This browser-local checker finds plausible same-asset transaction pairs, duplicate rows, competing matches, missing transfers and amount disagreements. It does <strong>not</strong> decide whether a transfer was yours or taxable.</p>
+<p class="row"><button type="button" id="sample">Load invented example</button> <a href="#tool">Jump to CSV comparison ↓</a></p>
+<div class="grid" id="tool">
+<section class="card"><h2>Outgoing CSV</h2><p class="small">Enter ONLY outgoing transfers from an account you control, not arbitrary trade rows. UTC time needs a timezone.</p><label for="out">Withdrawals CSV</label><textarea id="out" spellcheck="false" autocomplete="off" aria-label="Outgoing CSV rows to compare locally" placeholder="timestamp,asset,amount,txhash,fee&#10;2026-10-12T10:10:00Z,USDC,10.005,,0.005"></textarea></section>
+<section class="card"><h2>Incoming CSV</h2><p class="small">Enter ONLY incoming transfers. Your source fields stay inside this page.</p><label for="inc">Receipts CSV</label><textarea id="inc" spellcheck="false" autocomplete="off" aria-label="Incoming CSV rows to compare locally" placeholder="timestamp,asset,amount,txhash&#10;2026-10-12T10:11:00Z,USDC,10,"></textarea></section>
+</div>
+<section class="card">
+<h2>Compare privately</h2>
+<p class="small">Required columns: timestamp,asset,amount. Optional: txhash,fee. Supported aliases include Date(UTC), Coin, Quantity Transacted and Network Fee. Each timestamp requires Z or ±hh:mm timezone. 1000 rows / 128 KiB maximum per file. No RPC, cookies, wallet, sign-in, tracking, analytics or upload.</p>
+<p class="row"><label for="window">Time window (minutes)</label><input id="window" aria-label="Matching window minutes" type="number" min="1" max="1440" value="90" step="1"><button id="run" type="button">Find candidate pairs →</button><button id="clear" class="alt" type="button">Clear</button><button id="download" class="alt" type="button" disabled>Download row-only report</button></p>
+</section>
+<section class="card">
+<h2>Candidate observations — not proof of ownership</h2>
+<p id="summary" role="status" aria-live="polite">No CSVs inspected. Load the invented example to see how the analyzer works.</p><ol id="details"></ol>
+</section>
+<p class="warn"><strong>Financial and tax safety:</strong> No blockchain RPC or cost-basis records are accessed. An exact CSV pair or transaction hash does NOT establish your wallet ownership, a non-taxable self-transfer, cost basis, finality, correct transaction history or legal/tax treatment. Different token units, aggregators, bridges, amount fees and missing records can make matches wrong. Do not use this output alone for reporting or payments; consult the original records and qualified professionals.</p>
+<section class="card">
+<h2>What would you actually pay to fix?</h2>
+<p>We are interviewing users about broken exchange imports and USDC invoice/receipt mismatches. Feedback is valuable even if your realistic willingness to pay is <strong>$0</strong>. Send only an <strong>invented or anonymized</strong> example, hours lost and whether $0 / $9 / $29 / $99 would be justified to you.</p>
+<p class="row"><a class="button" href="mailto:onecursor1@gmail.com?subject=Crypto%20CSV%20demand%20feedback%20-%20no%20private%20data&amp;body=Problem%20without%20wallet%20address%2C%20tx%20ID%20or%20private%20CSV%3A%0AHours%20lost%3A%0APrice%20I%20would%20ACTUALLY%20pay%20%28%240%2F%249%2F%2429%2F%2499%29%3A%0AOne%20missing%20feature%3A">Send optional research feedback ↗</a></p>
+<p class="small">Emailing us may disclose your sender email address. Do not include private wallet details, tax returns, transaction hashes, customer data, KYC documents, login credentials or keys. No payment or feedback is required to use this tool. We have no evidence of paid users of this specific new tool yet. No actual user respondents or paid customers have been independently verified.</p>
+<h2>Need more than a free preview?</h2>
+<p>Indicative <strong>15 native Base USDC</strong> for a small (<strong>up to five</strong>) explicitly authorized, redacted source-linked discrepancy memo, subject to separately agreed lawful scope, acceptance, payee verification and payment. No tax return preparation, investment advice, address ownership certification or transaction recovery. Do not prepay an unverified wallet.</p>
+<p class="row"><a class="button" href="mailto:onecursor1@gmail.com?subject=Scoped%20Crypto%20CSV%20Discrepancy%20Memo%20%2815%20USDC%20quote%29&amp;body=Describe%20only%20synthetic%20or%20authorized%20redacted%20examples%3A%0AOne%20expected%20deliverable%3A%0ADate%3A%0APayment%20and%20payee%20terms%20must%20be%20agreed%20in%20writing.">Ask about a paid $15 scope ↗</a> <a href="csv-structural-preflight-005-base-usdc.html">Separate 0.005 USDC paid CSV STRUCTURE API ↗</a></p>
+<p class="small">The VM5 0.005 USDC API only checks generic CSV structure. It does not perform this matching or sell this specific memo. One actual human owns the related VM services.</p>
+</section>
+<section class="card"><h2>Original code and tests</h2><p><a href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/blob/main/transfer-pair-local.mjs">Open source matching engine</a> · <a href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/blob/main/tests/transfer-pair-local.test.mjs">Original reproducible tests</a>. Disclosed AI-assisted research, not a paid-client reference.</p></section>
+<footer>One Cursor · Original privacy-first crypto bookkeeping research · 2026-10-20 · No tax advice, wallet signing, past paid orders or independent chain verification implied.</footer>
+</main>
+<script type="module">
+import {reconcilePairs,EXAMPLE_WITHDRAWALS,EXAMPLE_RECEIPTS} from "../transfer-pair-local.mjs";
+const out=document.getElementById("out"),inc=document.getElementById("inc"),sum=document.getElementById("summary"),items=document.getElementById("details"),dl=document.getElementById("download");let report=null;
+const line=text=>{const li=document.createElement("li");li.textContent=text;items.append(li);};
+document.getElementById("sample").addEventListener("click",()=>{out.value=EXAMPLE_WITHDRAWALS;inc.value=EXAMPLE_RECEIPTS;items.replaceChildren();report=null;dl.disabled=true;sum.textContent="Invented-only sample loaded. No actual crypto was sent or read.";sum.dataset.warning="false";});
+document.getElementById("clear").addEventListener("click",()=>{out.value="";inc.value="";items.replaceChildren();report=null;dl.disabled=true;sum.textContent="Both CSV inputs cleared. Nothing was uploaded or stored.";sum.dataset.warning="false";});
+document.getElementById("run").addEventListener("click",()=>{
+ items.replaceChildren();report=null;dl.disabled=true;
+ try{
+  const r=reconcilePairs(out.value,inc.value,{windowMinutes:Number(document.getElementById("window").value)});report=r;dl.disabled=false;
+  const c=r.counts;
+  sum.textContent=c.candidatePairs+" possible pairs, "+c.ambiguousOutgoingRows+" ambiguous sends, "+c.amountDisagreements+" amount conflicts, "+c.unmatchedOutgoing+" unmatched sends, "+c.unmatchedIncoming+" unmatched deposits and "+c.invalidOrDuplicateRows+" input issues. NO pair is proven an owned/non-taxable transfer.";
+  sum.dataset.warning=String(c.ambiguousOutgoingRows+c.amountDisagreements+c.unmatchedOutgoing+c.invalidOrDuplicateRows>0);
+  for(const x of r.pairs)line("Withdrawal row "+x.fromRow+" vs receipt row "+x.toRow+" ("+x.asset+"): "+x.matchKind+"; clock delta "+x.clockDifferenceMinutes+" minutes. Unverified candidate.");
+  for(const x of r.ambiguous)line("Withdrawal row "+x.fromRow+" has multiple plausible receipt rows "+x.competingReceiptRows.join(", ")+". Not auto-matched.");
+  for(const x of r.amountDisagreements)line("Conflicting amount for "+x.asset+" between withdrawal row "+x.fromRow+" and receipt row "+x.toRow+".");
+  for(const x of r.inputIssues)line(x.side+" row "+x.row+": "+x.codes.join(", ")+".");
+  if(!items.children.length)line("No candidate match. Check the unmatched counts; no onchain or tax review was performed.");
+ }catch(e){sum.dataset.warning="true";sum.textContent=e instanceof Error?e.message:"Unable to parse source CSVs";}
+});
+dl.addEventListener("click",()=>{if(!report)return;const u=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=u;a.download="transfer-candidate-private-report.json";a.click();URL.revokeObjectURL(u);});
+</script>
+</body></html>
