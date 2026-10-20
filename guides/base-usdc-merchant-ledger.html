@@ -44,9 +44,11 @@ p{margin:10px 0}
 .muted,.caption{color:var(--muted)}
 .caption{font-size:.86rem}
 label{display:block;font-size:.9rem;font-weight:760;margin:17px 0 7px}
-textarea,input[type="text"],input[type="file"]{width:100%;padding:12px;border:1px solid #638196;border-radius:9px;background:#091a2b;color:var(--ink);font:14px/1.55 ui-monospace,Consolas,"Liberation Mono",monospace}
+textarea,input[type="text"],input[type="file"],select{width:100%;padding:12px;border:1px solid #638196;border-radius:9px;background:#091a2b;color:var(--ink);font:14px/1.55 ui-monospace,Consolas,"Liberation Mono",monospace}
 textarea{min-height:196px;resize:vertical}
 input[type="file"]{font-family:system-ui;font-size:.87rem}
+select{font-family:system-ui;max-width:100%}
+#feedback-send[hidden]{display:none}
 code{color:var(--blue);overflow-wrap:anywhere}
 .buttons{display:flex;gap:10px;flex-wrap:wrap;margin:21px 0 8px}
 .btn{border:1px solid #54768a;border-radius:10px;background:#1c364c;color:var(--ink);cursor:pointer;min-height:46px;padding:10px 15px;font-weight:750}
@@ -88,6 +90,7 @@ import {
   analyzeUsdcLedger,exportUsdcReviewCsv,SYNTHETIC_WALLET,SYNTHETIC_INPUT,
   MAX_BYTES,MAX_DATA_ROWS,
 } from "../usdc-ledger-local.mjs";
+import {feedbackEmailUrl} from "../buyer-feedback-local.mjs";
 import {parseBaseUsdcReceiptToCsv, ERC20_TRANSFER_TOPIC} from "../usdc-receipt-json-local.mjs";
 import {BASE_CIRCLE_USDC} from "../usdc-ledger-local.mjs";
 const el=id=>document.getElementById(id);
@@ -190,6 +193,26 @@ el("export").addEventListener("click",()=>{
   setTimeout(()=>URL.revokeObjectURL(objectUrl),1200);
   message("Local review CSV downloaded. It describes user-provided claims, not verified revenue.");
 });
+// User-driven product discovery: prepare an email draft but never auto-send or track.
+const buyerFields=["feedback-role","feedback-problem","feedback-frequency","feedback-budget","feedback-details"];
+const buyerEmail=el("feedback-send"),buyerStatus=el("feedback-status");
+function forgetFeedbackDraft(){
+  buyerEmail.hidden=true;buyerEmail.removeAttribute("href");
+  buyerStatus.textContent="Nothing is sent. Select your choices and prepare an email only if you want to reply.";
+}
+for(const field of buyerFields)el(field).addEventListener(field==="feedback-details"?"input":"change",forgetFeedbackDraft);
+el("feedback-prepare").addEventListener("click",()=>{
+  buyerEmail.hidden=true;buyerEmail.removeAttribute("href");
+  try{
+    buyerEmail.setAttribute("href",feedbackEmailUrl({
+      role:el("feedback-role").value, problem:el("feedback-problem").value,
+      frequency:el("feedback-frequency").value, budget:el("feedback-budget").value,
+      details:el("feedback-details").value,
+    }));
+    buyerEmail.hidden=false;
+    buyerStatus.textContent="Email draft prepared locally. Nothing has been sent. Open the email-app link, review the text, and send it yourself only if you choose.";
+  }catch(e){buyerStatus.textContent="Cannot prepare private feedback: "+String(e?.message||e);}
+});
 el("limits").textContent="Up to "+MAX_DATA_ROWS+" CSV data rows and "+(MAX_BYTES/1024)+" KiB. No automatic chain lookups.";
 </script>
 </head>
@@ -266,6 +289,28 @@ el("limits").textContent="Up to "+MAX_DATA_ROWS+" CSV data rows and "+(MAX_BYTES
 <p id="truncated" class="caption" hidden>Only the first 80 rows are displayed. The totals include the entire bounded input; the exported report includes every row.</p>
 <div class="buttons"><button id="export" class="btn primary" type="button" disabled>Download local review CSV</button></div>
 <p class="safe warning">No chain nodes were queried. None of these values represent independent settlements, completed customer invoices, actual seller receipts, merchant balances or tax statements. Independently check Base transactions, finality, actual recipient and proof of delivery before accounting.</p>
+</section>
+<section class="card" id="buyer-feedback" aria-labelledby="buyer-feedback-heading">
+<p class="kicker">Real buyer feedback · Voluntary · No tracking</p>
+<h2 id="buyer-feedback-heading">Which x402 or USDC issue actually costs you time — and what would you pay to fix it?</h2>
+<p class="muted">Select the issue that actually costs you time. We are testing <strong>real demand</strong>, not claiming thousands of users, fake reviews or income. Choose your role, problem, frequency and approximate <strong>willingness to pay</strong> for a demonstrably useful fix. This is only feedback, not an invoice, order or wallet transaction.</p>
+<p class="caption">No signup and no analytics. Preparing the feedback creates a browser-local email draft. We do not receive anything until <strong>you</strong> open your email app, review and send. Never include private keys, recovery phrases, customer data, invoices, addresses or transaction hashes.</p>
+<div class="grid"><div>
+<label for="feedback-role">Your role</label>
+<select id="feedback-role"><option value="">Choose an option</option><option value="x402 service seller">x402 service seller</option><option value="DeFi / crypto merchant">DeFi / crypto merchant</option><option value="Buyer-side agent operator">Buyer-side agent operator</option><option value="Wallet or payments developer">Wallet or payments developer</option><option value="Other crypto user">Other crypto user</option></select>
+<label for="feedback-problem">Biggest current blocker</label>
+<select id="feedback-problem"><option value="">Choose an option</option><option value="Browser CORS or unreadable HTTP 402 quote">Browser CORS or unreadable HTTP 402 quote</option><option value="USDC paid but delivery not confirmed">USDC paid but delivery not confirmed</option><option value="Duplicate/conflicting transfer receipts">Duplicate/conflicting transfer receipts</option><option value="Wrong network, token or recipient">Wrong network, token or recipient</option><option value="Payout/settlement CSV data quality">Payout/settlement CSV data quality</option><option value="Other issue">Other issue</option></select>
+</div><div>
+<label for="feedback-frequency">How often in the past 30 days?</label>
+<select id="feedback-frequency"><option value="">Choose an option</option><option value="Not yet — researching">Not yet — researching</option><option value="Once in the past 30 days">Once in the past 30 days</option><option value="2 to 10 times in the past 30 days">2 to 10 times in the past 30 days</option><option value="More than 10 times in the past 30 days">More than 10 times in the past 30 days</option></select>
+<label for="feedback-budget">What would you consider paying for a working scoped fix?</label>
+<select id="feedback-budget"><option value="">Choose an option</option><option value="Free advice only">Free advice only</option><option value="0.005 USDC per basic API report">0.005 USDC per basic API report</option><option value="0.75 to 2.50 USDC per focused analysis">0.75 to 2.50 USDC per focused analysis</option><option value="5 to 19 USDC per fixed-scope QA">5 to 19 USDC per fixed-scope QA</option><option value="20+ USDC for a defined deliverable">20+ USDC for a defined deliverable</option><option value="Need a working example before pricing">Need a working example before pricing</option></select>
+</div></div>
+<label for="feedback-details">Optional public non-sensitive context (max 280 characters)</label>
+<textarea id="feedback-details" style="min-height:96px" maxlength="280" spellcheck="false" placeholder="Example: My browser cannot read PAYMENT-REQUIRED from HTTP 402. No wallet details, please."></textarea>
+<div class="buttons"><button class="btn primary" type="button" id="feedback-prepare">Prepare private feedback email</button><a class="btn" id="feedback-send" hidden>Open your email app to review and send ↗</a></div>
+<p id="feedback-status" class="safe" role="status" aria-live="polite">Nothing is sent. Select your choices and prepare an email only if you want to reply.</p>
+<p class="caption">Same verified single-owner seller inbox: <a href="mailto:onecursor1@gmail.com?subject=Base%20USDC%20product%20feedback">onecursor1@gmail.com</a>. Submitted feedback is not automatically posted or treated as a paid purchase. A real payment requires separate authorization.</p>
 </section>
 <section class="service" aria-labelledby="paid">
 <span class="badge">Optional human-review contract · USDC</span>
