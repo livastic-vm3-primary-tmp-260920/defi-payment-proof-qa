@@ -42,18 +42,22 @@ function formatUnits(x) {
 export function parseCsv(text){
  if(typeof text!=="string"||!text||maxUtf8(text)>MAX_CSV_BYTES)fail("Each CSV must contain 1–131072 UTF-8 bytes");
  let input=text.startsWith("\uFEFF")?text.slice(1):text;
- const rows=[], row=[];let buf="",quoted=false,line=1;
- function pushCell(){if(row.length>=MAX_COLS)fail("CSV exceeds 32 columns");row.push(buf);buf="";}
+ const rows=[], row=[];let buf="",quoted=false,afterQuote=false,line=1;
+ function pushCell(){if(row.length>=MAX_COLS)fail("CSV exceeds 32 columns");row.push(buf);buf="";afterQuote=false;}
  function pushRow(){pushCell();if(row.some(x=>x.trim()!=="")){if(rows.length>MAX_ROWS+1)fail("CSV exceeds 1000 data rows");rows.push([...row]);}row.length=0;}
  for(let i=0;i<input.length;i++){
   const c=input[i];
   if(quoted){
    if(c==='"'&&input[i+1]==='"'){buf+='"';i++;}
-   else if(c==='"')quoted=false;
+   else if(c==='"'){quoted=false;afterQuote=true;}
    else {buf+=c;if(c==="\n")line++;}
   }else if(c==='"'){
-    if(buf!=="")fail("Unexpected quote in unquoted cell");
+    if(buf!==""||afterQuote)fail("Unexpected quote in unquoted cell");
     quoted=true;
+  }else if(afterQuote && (c===" "||c==="\t")){
+    // Permit whitespace after a properly closed CSV quote, not arbitrary text.
+  }else if(afterQuote && c!==","&&c!=="\n"&&c!=="\r"){
+    fail("Unexpected text after a quoted CSV field");
   }else if(c===","){pushCell();}
   else if(c==="\n"){pushRow();line++;}
   else if(c==="\r"&&input[i+1]==="\n"){pushRow();i++;line++;}

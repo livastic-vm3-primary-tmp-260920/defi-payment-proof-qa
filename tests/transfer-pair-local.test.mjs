@@ -91,3 +91,10 @@ test("untrusted no matching CSV rows still yields honest zeros",()=>{
  assert.equal(z.counts.unmatchedOutgoing,1);
  assert.equal(z.counts.unmatchedIncoming,1);
 });
+
+test("quote closure rejects stray appended text, preventing mangled exchange exports",()=>{
+ for(const input of ['a,b\n"one"junk,two','a,b\none"junk,two','a,b\n"one" "bad",two']){
+  assert.throws(()=>parseCsv(input));
+ }
+ assert.deepEqual(parseCsv('a,b\n"one" ,two'),[['a','b'],['one','two']]);
+});
