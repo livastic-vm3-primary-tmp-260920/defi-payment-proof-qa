@@ -45,3 +45,7 @@ This is the original same-owner VM5 merchant receiving route, not a new VM3 wall
 An original MIT-licensed Node.js x402 v2 **buyer** implementation is at:
 https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/tree/main/buyer-client
 Default = quote-only, no key/wallet/signature/gas/payment. Optional real payment is opt-in with a buyer's separately held low-value signer, two independent payment confirmation guards, amount0.005 native Circle BaseUSDC exactly, official paid POST endpoint and existing VM5 payTo pinned. Synthetic local SDK tests exercise 402->signed dummy request->HTTP200 and reject changed price/payee/network/asset before signing. The example did not purchase or cause a settlement for this merchant and must not be interpreted as an existing customer or paid transaction.
+
+## Free private CSV checker for your own input (no upload or payment)
+- https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/csv-free-local-checker.html
+- This page runs client-side structural checks with no user data sent and no wallet checkout. Paid reports are a separate, explicitly independently purchased VM5 x402 API for 0.005 native Circle USDC on Base; an HTTP 402 is NOT a sale.
