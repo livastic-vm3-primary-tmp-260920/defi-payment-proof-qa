@@ -1,0 +1,20 @@
+{
+  "name": "one-cursor-authorized-browser-x402-csv-buyer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Explicit opt-in browser checkout for independently buying the original VM5 hosted CSV preflight; owner does not sign or self-buy.",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "build": "esbuild src/app.mjs --bundle --platform=browser --format=esm --target=es2022 --minify --outfile=../assets/csv-x402-checkout.bundle.js"
+  },
+  "dependencies": {
+    "@x402/core": "2.28.0",
+    "@x402/evm": "2.28.0",
+    "@x402/fetch": "2.28.0",
+    "viem": "2.57.7"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}

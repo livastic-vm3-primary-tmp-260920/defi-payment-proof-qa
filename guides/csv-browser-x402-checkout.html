@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#071524">
+<meta name="description" content="Browser checkout for one explicitly authorized 0.005 Base USDC x402 CSV structure report. Free unpaid 402 quote first, exact token/payee/price guards, EIP-1193 buyer wallet only after two deliberate clicks. No merchant private keys, no auto-charge.">
+<link rel="canonical" href="https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/csv-browser-x402-checkout.html">
+<meta property="og:title" content="CSV x402 Paid Preflight — pay only after inspecting a 0.005 USDC quote">
+<title>CSV x402 Browser Checkout — Explicit 0.005 Base USDC Payment</title>
+<style>
+:root{color-scheme:dark;--bg:#081421;--panel:#13253b;--line:#38546d;--txt:#f0f6ff;--muted:#baccdf;--mint:#91f1c2;--gold:#f9d79c;--danger:#ffd0c0}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.58 system-ui,-apple-system,Segoe UI,sans-serif}
+main{max-width:980px;margin:auto;padding:22px 22px 80px}
+a{color:var(--mint);text-underline-offset:3px}a:focus-visible,button:focus-visible,textarea:focus-visible,input:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+nav{padding:14px 0 22px;font-size:14px;color:var(--muted)}
+.eyebrow{color:var(--mint);font-size:13px;letter-spacing:.13em;text-transform:uppercase;font-weight:800}
+h1{font-size:clamp(2.1rem,5vw,3.8rem);letter-spacing:-.045em;line-height:1.12;margin:14px 0}h2{font-size:clamp(1.35rem,2.9vw,2rem);margin:26px 0 12px}
+.lead{max-width:810px;color:var(--muted);font-size:1.12rem}
+.card{border:1px solid var(--line);border-radius:16px;padding:22px;background:var(--panel);margin:20px 0}
+.price{font-weight:850;font-size:2.9rem;color:var(--mint);letter-spacing:-.06em}
+.price small{font-size:.92rem;font-weight:500;letter-spacing:normal;color:var(--muted)}
+textarea{width:100%;min-height:205px;background:#091322;color:var(--txt);border:1px solid #7697aa;padding:14px;border-radius:9px;font:13px/1.6 ui-monospace,Consolas,monospace;resize:vertical}
+label{display:block;font-weight:650;margin:11px 0 8px}
+input[type=checkbox]{accent-color:var(--mint);inline-size:17px;block-size:17px;vertical-align:middle}
+.checkline{font-weight:400;margin:14px 0;display:flex;gap:11px;align-items:flex-start}
+.checkline span{color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin:16px 0}
+button{border:1px solid var(--mint);background:var(--mint);color:#092a1e;border-radius:10px;padding:13px 18px;font:700 15px/1.45 system-ui,sans-serif;cursor:pointer}
+button.alt{background:transparent;color:var(--mint)}
+button:disabled{opacity:.48;cursor:not-allowed}
+strong{color:var(--txt)}p,li{color:var(--muted)}
+.status{padding:15px 17px;background:#172d42;border:1px solid var(--line);border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.status[data-state=warn]{color:var(--gold)}.status[data-state=ok]{color:var(--mint)}
+.result{font:13px/1.55 ui-monospace,Consolas,monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:#0b1828;padding:17px;border-radius:10px;min-height:76px}
+.warning{background:#262333;border-left:4px solid var(--gold);padding:14px 17px;border-radius:0 10px 10px 0}
+.fine{font-size:13px}
+ol{padding-left:24px}.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+footer{color:var(--muted);border-top:1px solid var(--line);padding-top:18px;margin-top:45px;font-size:13px}
+@media(max-width:670px){main{padding:16px 14px 60px}.card{padding:15px}.cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<nav><a href="../">One Cursor / Payment QA</a> → <a href="csv-structural-preflight-005-base-usdc.html">CSV preflight details</a> → Optional independent buyer checkout</nav>
+<p class="eyebrow">Optional real payment by an independent buyer · not an automatic charge</p>
+<h1>Review your CSV for <span style="color:var(--mint)">0.005 Base USDC</span> — only if you authorize it.</h1>
+<p class="lead">This is a direct buyer-side interface for our existing original VM5 API, not another merchant. Inspect the exact amount, official native Circle USDC token and destination before a wallet prompt. Your CSV is sent to the hosted API <strong>before payment</strong> when you request a quote; only submit data you may disclose.</p>
+<div class="cols">
+<div class="card">
+<div class="eyebrow">Single x402 CSV structure preflight POST</div>
+<div class="price">0.005 <small>native Circle Base USDC</small></div>
+<p><strong>Merchant URL:</strong> <code>https://vm5-openapi-x402.onrender.com/v1/csv-preflight</code></p>
+<p><strong>Base chain:</strong> 8453. <strong>Official USDC:</strong> 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913</p>
+<p><strong>Expected payee:</strong> 0x6b01efA0705E91a7aca54271510bf9e594717f34</p>
+</div>
+<div class="card">
+<div class="eyebrow">Not spending money?</div>
+<h2>Test for free instead.</h2>
+<p>Use the local CSV preflight on this site to inspect basic structure without uploading your data or connecting any wallet. Or read the real merchant's public unpaid 402 quote in our free x402 inspector.</p>
+<p><a href="csv-free-local-checker.html">Free CSV checker</a> · <a href="x402-quote-safety.html">Free x402 price inspector</a></p>
+</div>
+</div>
+<section class="card" aria-labelledby="request-heading">
+<h2 id="request-heading">1. Provide an authorized CSV</h2>
+<p class="fine">Maximum 32 KiB. Do not include customer private information, credentials, wallet recovery phrases or payment signatures. The service provider may have ordinary request logs. The paid service checks row/column structure and suspicious spreadsheet patterns, not the correctness of your business transactions or wallet ownership.</p>
+<label for="csv">CSV to inspect</label>
+<textarea id="csv" spellcheck="false" autocomplete="off" aria-label="Buyer authorized public or non-confidential CSV content" placeholder="email,amount&#10;test@example.invalid,5.00"></textarea>
+<div class="row"><button type="button" class="alt" id="example-button">Load invented sample</button><button type="button" class="alt" id="reset-button">Clear all fields</button></div>
+<label class="checkline"><input type="checkbox" id="data-consent"><span>I control this data, have permission to submit it to the existing VM5 API for a payment quote, and understand it leaves this browser even before I buy.</span></label>
+<button type="button" id="quote-button">Request free unsigned quote — no wallet</button>
+</section>
+<section class="card" aria-labelledby="payment-heading">
+<h2 id="payment-heading">2. Review price, then optionally purchase</h2>
+<div class="status" id="status" role="status" aria-live="polite">No quote requested and no wallet connected. No payment attempted.</div>
+<p class="result" id="result" aria-live="polite">The exact public Base network, native USDC token, 0.005 price, expected payee and resource will appear here after a valid HTTP 402 quote.</p>
+<p class="warning"><strong>A matching quote is not proof of merchant identity or delivery.</strong> The signing authorization may enable actual 0.005 USDC transfer. Check your wallet's exact EIP-712 transfer-with-authorization payload before approving. Never sign if you expected a different amount, token, network or merchant. Payment failures can still settle; do not repeat blindly.</p>
+<button type="button" class="alt" id="connect-button" disabled>Connect my own Base wallet (no payment)</button>
+<p class="fine" id="wallet-display">No wallet connected. Browser wallet must support EIP-1193, Base mainnet and EIP-712 typed data; this is not verified on every wallet/hardware device. The page cannot switch networks automatically.</p>
+<label class="checkline"><input type="checkbox" id="pay-consent"><span>I have independently checked the on-screen 0.005 Base USDC price and full payee address, understand that a real authorization can spend my own funds, and approve <strong>at most one</strong> purchase attempt.</span></label>
+<div class="row">
+<button type="button" id="pay-button" disabled>Authorize ONE 0.005 USDC payment in my wallet</button>
+<button type="button" class="alt" id="export-button" disabled>Download my result (if delivered)</button>
+</div>
+<p class="fine"><strong>Payment flow status:</strong> This opt-in browser buyer is a limited initial implementation. Offline signing-guard tests pass, but <strong>no independent buyer-funded production checkout or paid report fulfillment has been verified end-to-end</strong>. Use only after reviewing code, and independently confirm wallet settlement. We do not hold buyer recovery keys, collect card payments or guarantee refunds or finality.</p>
+</section>
+<section class="card">
+<h2>How a sale is accounted for</h2>
+<ol>
+<li>The free quote shows only the terms of one API call. It is not a receipt or an invoice.</li>
+<li>Only an independent buyer may connect their own Base wallet, read and approve a fixed EIP-3009 USDC authorization, and choose to call the original hosted merchant.</li>
+<li>The merchant must return an actual result. A browser HTTP 200 alone does not prove irreversible onchain payment, and a browser error does not prove the transfer failed.</li>
+<li>A sale is credited to the operator only if a distinct external Base USDC token transfer is independently finalized and linked to authorized delivery. No buyer orders are claimed for this new checkout.</li>
+</ol>
+<p class="fine">Alternative: use the original <a href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/tree/main/buyer-client">CLI buyer implementation</a> in your own controlled environment. x402 specifications are maintained by the <a href="https://docs.x402.org/getting-started/quickstart-for-buyers">x402 Foundation</a>.</p>
+</section>
+<footer>One Cursor · AI-assisted independent work with one human economic owner · Existing VM5 original merchant · source: <a href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/tree/main/browser-buyer">browser buyer and reproducible safeguards</a> · No claims of real customer purchases or paid reviews.</footer>
+</main>
+<script type="module" src="../assets/csv-x402-checkout.bundle.js"></script>
+</body></html>
