@@ -57,7 +57,7 @@ def grab(url):
 def parse_site(xml):
     root = ET.fromstring(xml)
     urls = [item.text.strip() for item in root.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}loc") if item.text]
-    if not (1 <= len(urls) <= 8) or len(urls) != len(set(urls)) or not all(owned(url) for url in urls):
+    if not (1 <= len(urls) <= 12) or len(urls) != len(set(urls)) or not all(owned(url) for url in urls):
         raise ValueError("Sitemap unexpected or external; no site fetching")
     return urls
 
@@ -108,7 +108,7 @@ def run():
     result={"timestamp_utc":datetime.now(timezone.utc).isoformat(), "site":BASE,
             "sitemap_https_status":sitemap_code, "pages_checked":len(results),
             "internal_href_occurrences":total_internal, "observed_failures":faults,
-            "pages":results, "limitations":"Three sitemap pages; HTML static only; no JS interaction, responsive screenshot, auth, forms, hidden links, external hosts or actual buyer traffic measured.",
+            "pages":results, "limitations":"Bounded owner sitemap pages; HTML static only; no JS interaction, responsive screenshot, auth, forms, hidden links, external hosts or actual buyer traffic measured.",
             "marketing_status":"Sample QA of own product; not a buyer order or paid acceptance",
             "new_actual_buyer_income_usdc":0}
     return result

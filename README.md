@@ -31,3 +31,9 @@ Read-only static website; no cookies, pixel trackers, hosted credentials, or che
 - Browser-only and zero network requests from the UI: input is not persisted/uploaded and no payment is signed; synthetic example button provided.
 - Links to original **separate** VM5 paid, buyer-authorized `POST /v1/csv-preflight` for **0.005 native Circle Base USDC** only after user chooses to purchase through documented external wallet and x402 SDK. This is a sales funnel, NOT a new buyer order, invoice, payout, or deposit.
 - Pure reusable logic: `csv-local-check.mjs`; `node --test tests/csv-local-check.test.mjs`; isolated Chrome smoke `python3 -B tests/csv-ui-headless-smoke.py`. Original VM5 merchant/source/payTo/price and all live user credentials unchanged.
+
+## 2026-10-20 — free original Base USDC merchant duplicate/delivery-claim ledger
+- Public frontend route: guides/base-usdc-merchant-ledger.html, original local parser usdc-ledger-local.mjs, reproducible original tests tests/usdc-ledger-local.test.mjs, tests/usdc-ledger-landing.test.mjs and isolated Chrome test tests/usdc-ledger-ui-smoke.cjs.
+- Uses existing csv-local-check.mjs strict RFC4180-style parser; input 500 records/32 KiB max. No RPC, private key, account login, file upload or payment, and no claim of verified chain receipts/revenue from user-supplied CSV.
+- After entering a public receiving address, buyer can analyze only normalized Base 8453 / native Circle USDC transfer-event claims, detect duplicate or contradicting txHash:logIndex, wrong recipient, token, or undelivered claims; download local bounded CSV review.
+- Separate from the existing VM5 original paid 0.005 USDC generic POST structural checker. The optional existing owner VM3 paid manual public receipt review (5/15 USDC) requires written independent contract. No new seller persona or payout wallet; no historical new paid order implied.

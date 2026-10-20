@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1826">
+<meta name="robots" content="index,follow">
+<meta name="description" content="Free private Base USDC seller CSV reconciliation: spot duplicate txHash:logIndex events, wrong tokens, wrong recipients, and payment-versus-delivery claims. No file upload, wallet connection, fee or registration.">
+<link rel="canonical" href="https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/base-usdc-merchant-ledger.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Base USDC Seller Ledger — Free Local Duplicate & Delivery Checker">
+<meta property="og:description" content="Find duplicated or mismatched Base USDC payment claims in a CSV locally. Export a review report without uploading your wallet data.">
+<title>Free Base USDC Seller Ledger | CSV Duplicate Events & Delivery Exceptions</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1421;--panel:#14283b;--panel2:#0f2335;--line:#375368;--mint:#9af0c4;--blue:#a7d9fa;--amber:#f7cf86;--ink:#f4f8ff;--muted:#becfdf}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 80% -12%,#17444a 0,transparent 45%),var(--bg);color:var(--ink);font:16px/1.65 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+a{color:var(--mint);text-underline-offset:3px}
+a:hover{text-decoration-thickness:2px}
+button,a,input,textarea{font:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+nav{border-bottom:1px solid var(--line);background:#0a1724}
+nav .wrap{display:flex;gap:20px;align-items:center;justify-content:space-between;min-height:64px}
+.wrap{max-width:1120px;padding:0 22px;margin:auto}
+.brand{font-weight:850;letter-spacing:-.04em;text-decoration:none;color:var(--ink)}
+.brand span{color:var(--mint)}
+.navlinks{display:flex;gap:20px;flex-wrap:wrap;font-size:.91rem}
+.navlinks a{text-decoration:none;color:var(--muted)}
+.navlinks a:hover{color:var(--ink)}
+main{padding:0 0 90px}
+.hero{padding:66px 0 40px}
+.kicker{font-size:.78rem;font-weight:850;text-transform:uppercase;letter-spacing:.13em;color:var(--mint)}
+h1{font-size:clamp(2.35rem,5.4vw,4.5rem);line-height:1.09;letter-spacing:-.056em;margin:14px 0 24px;max-width:960px}
+h1 em{color:var(--mint);font-style:normal}
+.lead{max-width:770px;color:var(--muted);font-size:1.17rem}
+.limits{font-size:.86rem;color:var(--muted);padding:11px 14px;border-left:3px solid var(--mint);background:#122c37;max-width:830px}
+section{margin-top:34px}
+.grid{display:grid;grid-template-columns:minmax(0,1.26fr) minmax(290px,.75fr);gap:18px;align-items:start}
+.card{background:var(--panel);padding:24px;border:1px solid var(--line);border-radius:16px}
+.card h2{margin:3px 0 12px;font-size:1.42rem;letter-spacing:-.022em}
+.card h3{font-size:1.05rem;margin:14px 0 7px}
+p{margin:10px 0}
+.muted,.caption{color:var(--muted)}
+.caption{font-size:.86rem}
+label{display:block;font-size:.9rem;font-weight:760;margin:17px 0 7px}
+textarea,input[type="text"],input[type="file"]{width:100%;padding:12px;border:1px solid #638196;border-radius:9px;background:#091a2b;color:var(--ink);font:14px/1.55 ui-monospace,Consolas,"Liberation Mono",monospace}
+textarea{min-height:196px;resize:vertical}
+input[type="file"]{font-family:system-ui;font-size:.87rem}
+code{color:var(--blue);overflow-wrap:anywhere}
+.buttons{display:flex;gap:10px;flex-wrap:wrap;margin:21px 0 8px}
+.btn{border:1px solid #54768a;border-radius:10px;background:#1c364c;color:var(--ink);cursor:pointer;min-height:46px;padding:10px 15px;font-weight:750}
+.btn.primary{background:var(--mint);border-color:var(--mint);color:#06281a}
+.btn:hover{filter:brightness(1.12)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+a.btn{display:inline-flex;align-items:center;text-decoration:none}
+.note{font-size:.9rem;color:var(--muted)}
+.safe{border-left:3px solid var(--mint);padding:10px 14px;background:#0b3034;margin:18px 0;border-radius:5px}
+.warning{border-left-color:var(--amber);background:#3a2b19}
+.kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px 0}
+.kpi{padding:19px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}
+.kpi strong{font-size:clamp(1.45rem,3vw,2.2rem);letter-spacing:-.03em;color:var(--mint);display:block;overflow-wrap:anywhere}
+.kpi span{font-size:.82rem;color:var(--muted)}
+article strong{color:var(--ink)}
+ul{padding-left:20px}
+li{margin:10px 0}
+.table-wrap{max-width:100%;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th,td{border-bottom:1px solid var(--line);padding:9px 8px;text-align:left;vertical-align:top}
+th{color:var(--mint);font-size:.78rem}
+td{overflow-wrap:anywhere}
+#report[hidden]{display:none}
+.row-good{color:var(--mint)}
+.row-review,.row-conflict{color:var(--amber)}
+.snippet{font:13px/1.62 ui-monospace,Consolas,monospace;overflow:auto;padding:14px;border-radius:8px;background:#081927;border:1px solid #344858;white-space:pre;max-width:100%}
+.service{border:1px solid #4d907a;background:linear-gradient(120deg,#173739,#14263b);padding:25px;border-radius:16px}
+.badge{display:inline-block;border-radius:99px;background:var(--mint);color:#073128;font-size:.76rem;padding:4px 10px;font-weight:800}
+hr{border:0;border-top:1px solid var(--line);margin:22px 0}
+footer{border-top:1px solid var(--line);padding-top:24px;color:var(--muted);font-size:.9rem}
+@media(max-width:850px){.grid{grid-template-columns:1fr}.hero{padding:44px 0 20px}}
+@media(max-width:600px){.wrap{padding:0 14px}.card{padding:18px}.navlinks{gap:10px;font-size:.81rem}nav .wrap{display:block;padding-top:14px;padding-bottom:15px}.kpis{grid-template-columns:1fr}.btn{width:100%}}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Base USDC Seller Ledger — Private Local Reconciliation Preview","description":"Free browser-only structural reconciliation of user-supplied USDC receipt CSV claims, not on-chain settlement proof.","applicationCategory":"FinanceApplication","operatingSystem":"Web browser","isAccessibleForFree":true,"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"url":"https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/base-usdc-merchant-ledger.html"}
+</script>
+<script type="module">
+import {
+  analyzeUsdcLedger,exportUsdcReviewCsv,SYNTHETIC_WALLET,SYNTHETIC_INPUT,
+  MAX_BYTES,MAX_DATA_ROWS,
+} from "../usdc-ledger-local.mjs";
+const el=id=>document.getElementById(id);
+const csv=el("csv"),wallet=el("wallet"),status=el("status"),reportBox=el("report"),fileInput=el("csv-file");
+const count=el("counts"),tableBody=el("findings-body");
+let report=null;
+function message(s,warning=false){status.textContent=s;status.classList.toggle("warning",warning);}
+function reset(){
+  report=null;reportBox.hidden=true;el("export").disabled=true;
+}
+function make(tag,txt){const node=document.createElement(tag);node.textContent=txt;return node;}
+function render(result){
+  report=result;reportBox.hidden=false;
+  el("export").disabled=false;
+  el("claimed-usdc").textContent=result.claimedCandidateUsdc;
+  el("claimed-count").textContent=String(result.candidateRecords);
+  el("review-count").textContent=String(result.reviewRecords);
+  count.textContent="Read "+result.rowsRead+" CSV records; "+result.duplicateRecords+" identical duplicate(s); "+
+    result.conflictingEvents+" conflicting event ID(s); "+result.uniqueEventKeys+" distinct parseable event keys.";
+  tableBody.replaceChildren();
+  for(const r of result.records.slice(0,80)){
+    const tr=make("tr","");
+    const vals=[String(r.csvRecord),r.eventKey?r.eventKey.slice(0,12)+"…"+r.eventKey.slice(-5):"Invalid event key",
+      r.amountUsdc??"Invalid amount",r.state.replace(/_/g," "),r.flags.join(" · ")||"No structural issue detected"];
+    vals.forEach((v,i)=>{const td=make("td",v);if(i===3)td.className=r.state==="candidate_unverified"?"row-good":"row-review";tr.append(td);});
+    tableBody.append(tr);
+  }
+  el("truncated").hidden=result.records.length<=80;
+  message("Local analysis complete. No network call, file upload, payment, wallet signature or persistence.");
+}
+el("run").addEventListener("click",()=>{
+  reset();
+  try{render(analyzeUsdcLedger(csv.value,wallet.value));}
+  catch(e){message("CSV could not be reconciled: "+String(e?.message||e),true);}
+});
+el("sample").addEventListener("click",()=>{
+  reset();wallet.value=SYNTHETIC_WALLET;csv.value=SYNTHETIC_INPUT;fileInput.value="";
+  message("Invented demonstration data loaded. Click 'Check local claims'. No real payment is represented.");csv.focus();
+});
+el("clear").addEventListener("click",()=>{
+  reset();wallet.value="";csv.value="";fileInput.value="";
+  message("The input was cleared from this page. No data was saved or uploaded.");wallet.focus();
+});
+fileInput.addEventListener("change",async()=>{
+  reset();
+  const f=fileInput.files?.[0];
+  if(!f)return;
+  if(f.size>MAX_BYTES){fileInput.value="";message("File exceeds the "+MAX_BYTES+" byte local inspection limit.",true);return;}
+  try{
+    csv.value=await f.text();
+    message("CSV file loaded into the browser only. Inspect the text before analyzing; it was not uploaded.");
+  }catch(e){message("Could not read the local file. Nothing was uploaded.",true);}
+});
+el("export").addEventListener("click",()=>{
+  if(!report)return;
+  const contents=exportUsdcReviewCsv(report);
+  const blob=new Blob([contents],{type:"text/csv;charset=utf-8"});
+  const objectUrl=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=objectUrl;a.download="base-usdc-local-review.csv";a.hidden=true;document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(objectUrl),1200);
+  message("Local review CSV downloaded. It describes user-provided claims, not verified revenue.");
+});
+el("limits").textContent="Up to "+MAX_DATA_ROWS+" CSV data rows and "+(MAX_BYTES/1024)+" KiB. No automatic chain lookups.";
+</script>
+</head>
+<body>
+<nav aria-label="Site navigation"><div class="wrap">
+<a class="brand" href="../">VM3 <span>PAYMENT / QA</span></a>
+<div class="navlinks"><a href="../">All services</a><a href="./csv-free-local-checker.html">Generic CSV checker</a><a href="../services/public-web-qa-19-usdc.html">Website QA</a></div>
+</div></nav>
+<main class="wrap">
+<header class="hero">
+<p class="kicker">Free · Private · Browser only · Base mainnet USDC</p>
+<h1>Stop counting the <em>same payment twice.</em></h1>
+<p class="lead">Paste your x402 seller or merchant transfer CSV. Spot duplicate transaction log IDs, the wrong USDC contract or destination, self-transfers, and deliveries that do not match the claimed transfer record. Your wallet address and CSV stay in this browser.</p>
+<p class="limits"><strong>Important:</strong> A CSV is a claim, not a chain receipt. This tool does <strong>not</strong> connect to Base RPC, verify transaction finality, authorize a payment or prove taxable/realized revenue. Treat the subtotal only as an <strong>unverified candidate</strong> requiring independent chain and delivery evidence.</p>
+</header>
+<div class="grid">
+<section class="card" aria-labelledby="input-title" style="margin-top:0">
+<h2 id="input-title">1. Check your own CSV locally</h2>
+<label for="wallet">Receiving wallet on Base (0x + 40 hex characters)</label>
+<input id="wallet" type="text" spellcheck="false" inputmode="text" autocomplete="off" placeholder="0x… (your public receiving wallet)" aria-describedby="wallet-note">
+<p id="wallet-note" class="caption">Paste only a public receiver address. Never paste a private key, seed phrase, API credential or session token. We cannot access, verify or move funds.</p>
+<label for="csv">Transaction-log CSV text</label>
+<textarea id="csv" spellcheck="false" aria-describedby="format" placeholder="chain_id,token_address,tx_hash,log_index,from,to,amount_usdc,delivery_status&#10;8453,0x833589fcd6edb6e08f4c7c32d4f71b54bda02913,0x...,...,...,...,0.005,delivered"></textarea>
+<p id="format" class="caption">Required headers: <code>chain_id, token_address, tx_hash, log_index, from, to, amount_usdc, delivery_status</code>. Optional: <code>order_id</code>. USDC amounts are decimal values (not base units), with at most 6 fractional digits. Recognized delivery claims: delivered, pending, partial, failed. Input without a log index cannot safely distinguish multiple transfers inside one transaction.</p>
+<label for="csv-file">Or load a local CSV file (nothing is uploaded)</label>
+<input type="file" id="csv-file" accept=".csv,text/csv" aria-label="Load local CSV file">
+<div class="buttons">
+<button class="btn primary" id="run" type="button">Check local claims</button>
+<button class="btn" id="sample" type="button">Try synthetic example</button>
+<button class="btn" id="clear" type="button">Clear local input</button>
+</div>
+<p id="limits" class="caption">Maximum 500 rows, 32 KiB.</p>
+<p id="status" class="safe" role="status" aria-live="polite">No transaction CSV has been analyzed. Start with the synthetic example.</p>
+</section>
+<aside class="card" aria-label="How it works" style="margin-top:0">
+<h2>2. What gets flagged?</h2>
+<ul>
+<li><strong>Duplicate event:</strong> a repeated <code>8453:txHash:logIndex</code> cannot increase the claim subtotal.</li>
+<li><strong>Conflict:</strong> two contradictory rows with the same event ID are <em>both</em> excluded.</li>
+<li><strong>Wrong asset:</strong> require the exact <a href="https://basescan.org/token/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913">native Circle USDC contract on Base</a>, not just the text “USDC”.</li>
+<li><strong>Wrong recipient:</strong> do not count transfers to other wallets or self-transfers.</li>
+<li><strong>Delivery mismatch:</strong> pending, partial, failed and unknown delivery claims are never treated as successful orders.</li>
+</ul>
+<hr>
+<p class="caption"><strong>Privacy boundary:</strong> The app performs no fetch, wallet connection, analytics, cookies, server upload, storage write or transaction signing. Only you can download the local report.</p>
+<p class="caption">If your explorer export lacks <code>log_index</code>, obtain event-level records before reconciling. The tool deliberately does not guess which transfers are the same.</p>
+</aside>
+</div>
+<section id="report" class="card" aria-label="Local review results" hidden>
+<p class="kicker">3. Claim-only reconciliation</p>
+<h2>Local review — not a payment receipt</h2>
+<div class="kpis" aria-label="Preview metrics">
+<div class="kpi"><strong id="claimed-usdc">0.000000</strong><span>USDC in structurally eligible, user-claimed delivered rows. <b>Not on-chain verified or revenue.</b></span></div>
+<div class="kpi"><strong id="claimed-count">0</strong><span>Candidate unique event claims</span></div>
+<div class="kpi"><strong id="review-count">0</strong><span>Rows requiring review, duplicate exclusion or conflict resolution</span></div>
+</div>
+<p id="counts" class="muted"></p>
+<div class="table-wrap">
+<table aria-label="First 80 local review entries"><thead><tr><th>CSV record</th><th>Event key</th><th>Claim USDC</th><th>Review state</th><th>Reason</th></tr></thead><tbody id="findings-body"></tbody></table>
+</div>
+<p id="truncated" class="caption" hidden>Only the first 80 rows are displayed. The totals include the entire bounded input; the exported report includes every row.</p>
+<div class="buttons"><button id="export" class="btn primary" type="button" disabled>Download local review CSV</button></div>
+<p class="safe warning">No chain nodes were queried. None of these values represent independent settlements, completed customer invoices, actual seller receipts, merchant balances or tax statements. Independently check Base transactions, finality, actual recipient and proof of delivery before accounting.</p>
+</section>
+<section class="service" aria-labelledby="paid">
+<span class="badge">Optional human-review contract · USDC</span>
+<h2 id="paid">Have ambiguous payments or disputed delivery?</h2>
+<p class="lead">A machine-generated CSV report cannot settle a payment dispute. Request a source-linked evidence memo for <strong>5 USDC for one public transfer</strong> or a <strong>15 USDC scoped reconciliation for up to five public transactions</strong>, subject to a written quote and buyer approval. No order, payment, review, guarantee or past client engagement is implied by this page.</p>
+<div class="buttons">
+<a class="btn primary" href="mailto:onecursor1@gmail.com?subject=Paid%20Base%20USDC%20receipt%20reconciliation%20%E2%80%94%205%20or%2015%20USDC&amp;body=Public%20Base%20transaction%20links%20only%3A%0AExpected%20receiver%3A%0ANumber%20of%20transactions%3A%0APreferred%20delivery%20date%3A%0AI%20request%20a%20written%20USDC%20quote%20and%20acceptance%20terms%20before%20any%20paid%20work.">Ask for an exact paid scope ↗</a>
+<a class="btn" href="https://opentask.ai/profiles/cmvckd5ok00cx08jyc1yh8bvz">Existing USDC-ready seller identity ↗</a>
+</div>
+<p class="caption">OpenTask links to the seller profile, not an instant checkout or an automatically purchased service. A real buyer must separately accept the scope, payee, Base chain and Circle USDC asset before any voluntary payment. No sensitive customer data or wallet keys should be emailed.</p>
+<p class="caption"><strong>Machine buyers:</strong> Our existing single-owner <a href="https://api.soul.mds.markets/v1/soul/vm3-usdc-receipt-qa">Soul.Markets AI service profile</a> offers a separately purchased <strong>2.50 Base USDC</strong> AI-assisted review of up to 15 public buyer-supplied transfer rows. It checks record consistency only (no chain fetch or payment finality); inspect the published input schema and agree to that marketplace's x402 terms before making a deliberate purchase. This free browser tool itself performs no paid API calls. The external platform has reported zero prior orders for this SKU.</p>
+</section>
+<section class="card" aria-labelledby="usage">
+<h2 id="usage">How to prepare a valid event-level CSV</h2>
+<p>One line should represent one <strong>ERC-20 Transfer log</strong> on Base. Provide chain ID 8453, the actual Base Circle USDC contract address, complete transaction hash, event log index, payer, payee, microprecision decimal amount and your independently recorded delivery state. Never replace a missing event index with a guessed zero.</p>
+<div class="snippet">chain_id,token_address,tx_hash,log_index,from,to,amount_usdc,delivery_status
+8453,0x833589fcd6edb6e08f4c7c32d4f71b54bda02913,0x[64 hex chars],12,0x[payer],0x[payee],0.005,delivered</div>
+<p class="caption">The bracketed placeholders above are explanatory, not a valid CSV event. Use “Try synthetic example” for a fully valid invented dataset. Do not upload real private invoices or user identifiers to third-party sites to generate this input.</p>
+<p class="caption">View the <a href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa">original open-source implementation</a>, <a href="https://docs.basescan.org/api-endpoints/tokens">BaseScan ERC-20 token reference</a>, or our <a href="./csv-free-local-checker.html">separate generic local CSV structural checker</a>. This is general data-quality tooling, not financial, legal, tax or security certification advice.</p>
+</section>
+</main>
+<footer class="wrap">Original one-beneficial-owner AI-assisted engineering · Base USDC Seller Ledger · 2026 · <a href="../">All VM3 services</a> · <a href="./x402-seller-settlement-floor.html">x402 seller guide</a></footer>
+</body>
+</html>
