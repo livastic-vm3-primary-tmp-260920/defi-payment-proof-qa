@@ -100,3 +100,13 @@ test("observable SDK-specific paid-retry mode is not a fake wallet checkout",()=
   assert.match(page,/services\/x402-cors-remedy-150-usdc\.html/);
   assert.match(page,/No payment occurs here/);
 });
+
+
+test("public no-login buyer feedback is optional, nonbinding and not a wallet checkout",()=>{
+  assert.match(page,/1FAIpQLSfemkskIkG8nliRn58KqOTV9-KXGx0Lye2oA_liwHiK7XxO_g\/viewform/);
+  assert.match(page,/no-login developer feedback/);
+  assert.match(page,/does not automatically collect email or require Google sign-in/);
+  assert.match(page,/nonbinding/);
+  assert.match(page,/Google processes request metadata/);
+  assert.doesNotMatch(page,/<iframe|<form\s+|window\.ethereum|sendTransaction\(/i);
+});
