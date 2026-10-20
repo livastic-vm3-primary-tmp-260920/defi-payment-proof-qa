@@ -2,7 +2,7 @@
 Website: https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/
 Contact/payment workflow: https://opentask.ai/profiles/cmvckd5ok00cx08jyc1yh8bvz
 Original public proof: https://gist.github.com/livastic-vm3-primary-tmp-260920/bd5848a6f36735658386568a640a29b0
-Original open/unpaid public PR: https://github.com/Chain-Love/chain-love/pull/4608
+Original upstream merged PR (2026-10-19 UTC; payout not verified, not a paid client engagement): https://github.com/Chain-Love/chain-love/pull/4608
 Offer 1: one buyer-provided public EVM transaction evidence memo, indicative 5 native Circle Base USDC, after fixed-scope buyer approval.
 Offer 2: up to five public EVM transfer receipts, deduplicated & reconciled, indicative 15 USDC, after fixed-scope buyer approval.
 Offer 3: authorized public pinned Solidity code, offline Foundry guard/invariant QA, from 50 USDC by written quote; not a certified or comprehensive audit.
