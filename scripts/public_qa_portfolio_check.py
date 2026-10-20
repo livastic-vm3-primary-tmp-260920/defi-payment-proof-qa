@@ -57,7 +57,7 @@ def grab(url):
 def parse_site(xml):
     root = ET.fromstring(xml)
     urls = [item.text.strip() for item in root.findall(".//{http://www.sitemaps.org/schemas/sitemap/0.9}loc") if item.text]
-    if not (1 <= len(urls) <= 12) or len(urls) != len(set(urls)) or not all(owned(url) for url in urls):
+    if not (1 <= len(urls) <= 18) or len(urls) != len(set(urls)) or not all(owned(url) for url in urls):
         raise ValueError("Sitemap unexpected or external; no site fetching")
     return urls
 

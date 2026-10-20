@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1826">
+<meta name="robots" content="index,follow">
+<meta name="description" content="Free x402 CORS Browser Doctor: test whether the browser can read an unpaid PAYMENT-REQUIRED HTTP 402 challenge, and diagnose pasted OPTIONS/402 response headers offline. No wallet, signature or payment.">
+<link rel="canonical" href="https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/x402-browser-cors-doctor.html">
+<meta property="og:title" content="Free x402 Browser CORS Doctor — Can Your Buyer Read HTTP 402?">
+<meta property="og:type" content="website">
+<meta property="og:description" content="Run an explicitly authorized, unpaid public GET check in a real browser or analyze pasted OPTIONS/402 CORS headers locally.">
+<title>Free x402 Browser CORS Doctor | Debug 402 Price Header & Payment Preflight</title>
+<style>
+:root{color-scheme:dark;--bg:#0a1524;--panel:#122739;--panel2:#0c2230;--line:#386073;--ink:#f4f8fc;--muted:#b4c9d8;--mint:#94f0c6;--sky:#a8d8f8;--amber:#ffd48e}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 90% -18%,#20514e 0,transparent 44%),var(--bg);color:var(--ink);font:16px/1.67 system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--mint);text-underline-offset:3px}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+nav{border-bottom:1px solid var(--line);background:#081523}
+.wrap{max-width:1070px;padding:0 23px;margin:auto}
+nav .wrap{display:flex;gap:20px;align-items:center;justify-content:space-between;min-height:65px}
+nav a{font-size:.9rem}
+.brand{font-size:1.08rem;font-weight:850;letter-spacing:-.03em;text-decoration:none;color:var(--ink)}
+.brand span{color:var(--mint)}
+.navlinks{display:flex;gap:17px;flex-wrap:wrap}
+.navlinks a{text-decoration:none;color:var(--muted)}
+main{padding:0 0 65px}
+.hero{padding:56px 0 30px}
+.kicker{font-size:.78rem;color:var(--mint);letter-spacing:.11em;text-transform:uppercase;font-weight:850}
+h1{font-size:clamp(2.3rem,5.2vw,4.25rem);letter-spacing:-.055em;line-height:1.1;margin:11px 0 24px;max-width:915px}
+h1 em{font-style:normal;color:var(--mint)}
+h2{font-size:1.43rem;letter-spacing:-.025em;margin:0 0 12px}
+h3{font-size:1rem;margin:14px 0 7px}
+p{margin:10px 0}
+.lead{max-width:760px;color:var(--muted);font-size:1.15rem}
+.warn{border-left:3px solid var(--amber);background:#33291f;padding:12px 15px;border-radius:5px;color:#ffe6bf;font-size:.92rem}
+.good{border-left:3px solid var(--mint);background:#123934;padding:12px 15px;border-radius:5px;color:var(--ink);font-size:.92rem}
+section{margin:25px 0}
+.grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:18px;align-items:start}
+.card{border:1px solid var(--line);background:var(--panel);border-radius:16px;padding:25px;min-width:0;overflow-wrap:anywhere}
+.card.alt{background:var(--panel2)}
+label{display:block;font-size:.92rem;font-weight:760;margin:15px 0 7px}
+label.check{display:flex;gap:9px;align-items:flex-start;font-size:.88rem;font-weight:500;color:var(--muted)}
+label.check input{margin-top:7px;flex:none}
+input:not([type=checkbox]),textarea,select{width:100%;background:#091b2c;border:1px solid #65849b;color:var(--ink);border-radius:9px;padding:12px;font:14px/1.52 ui-monospace,Menlo,Consolas,monospace;max-width:100%}
+textarea{min-height:126px;resize:vertical}
+button,.btn{border:1px solid #66839c;border-radius:9px;background:#1c3950;color:var(--ink);font:inherit;font-weight:770;cursor:pointer;padding:10px 14px;min-height:45px}
+button.primary,.btn.primary{background:var(--mint);border-color:var(--mint);color:#04241a}
+button:hover,.btn:hover{filter:brightness(1.10)}
+button:disabled{cursor:not-allowed;opacity:.52}
+.btn{display:inline-flex;align-items:center;text-decoration:none}
+.btns{display:flex;gap:9px;flex-wrap:wrap;margin-top:19px}
+.muted,.caption{color:var(--muted)}
+.caption{font-size:.86rem}
+pre,code{font-family:ui-monospace,Menlo,Consolas,monospace}
+code{color:var(--sky);overflow-wrap:anywhere}
+pre{background:#081925;border:1px solid var(--line);border-radius:8px;padding:14px;font-size:.82rem;line-height:1.6;overflow:auto}
+ul{padding-left:22px}
+li{padding:3px 0;overflow-wrap:anywhere}
+#offline-results[hidden]{display:none}
+#live-results[hidden]{display:none}
+.status{font-size:.89rem;margin-top:16px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:19px 0}
+.stat{border:1px solid var(--line);border-radius:12px;padding:16px;background:#0c2933}
+.stat strong{display:block;font-size:1.4rem;color:var(--mint);overflow-wrap:anywhere}
+.stat span{font-size:.82rem;color:var(--muted)}
+footer{border-top:1px solid var(--line);padding-top:26px;color:var(--muted);font-size:.86rem}
+@media(max-width:830px){.grid{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:600px){.wrap{padding:0 15px}.hero{padding:39px 0 20px}.card{padding:17px}.btns button,.btns .btn{width:100%}nav .wrap{display:block;padding-top:13px;padding-bottom:13px}.navlinks{gap:10px;margin-top:7px}.stat-grid{grid-template-columns:1fr}}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"x402 Browser CORS Doctor — Free Payment Header Diagnostic","applicationCategory":"DeveloperApplication","operatingSystem":"Web browser","isAccessibleForFree":true,"description":"Original one-owner browser-only live unpaid GET and private pasted-header inspector for x402 HTTP 402 and OPTIONS CORS issues. Does not send signatures or verify payment settlement.","url":"https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/x402-browser-cors-doctor.html","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+</script>
+<script type="module">
+import {
+  validateProbeUrl,validateBrowserOrigin,diagnoseCorsHeaders,summarizeLiveBrowserResult,
+} from "../x402-cors-doctor-local.mjs";
+const el=id=>document.getElementById(id);
+const origin=el("buyer-origin"),url=el("public-endpoint");
+origin.value=location.origin;
+const show=(id,text,warning=false)=>{
+  const target=el(id);target.textContent=text;target.classList.toggle("warn",warning);target.classList.toggle("good",!warning);
+};
+function addResult(list,value){
+  const item=document.createElement("li");
+  item.textContent=value;
+  list.append(item);
+}
+function demoHeaders(){
+  const o=location.origin;
+  el("challenge-paste").value=[
+    "HTTP/2 402",
+    "Access-Control-Allow-Origin: "+o,
+    "Access-Control-Expose-Headers: PAYMENT-REQUIRED,PAYMENT-RESPONSE",
+    "PAYMENT-REQUIRED: eyJ4NDAyVmVyc2lvbiI6Mn0=",
+    "Cache-Control: no-store",
+    "",
+  ].join("\n");
+  el("options-paste").value=[
+    "HTTP/2 204",
+    "Access-Control-Allow-Origin: "+o,
+    "Access-Control-Allow-Methods: GET,POST,OPTIONS",
+    "Access-Control-Allow-Headers: Content-Type,PAYMENT-SIGNATURE,PAYMENT-RESPONSE",
+    "Access-Control-Max-Age: 600",
+    "",
+  ].join("\n");
+  show("offline-status","Invented 402 and OPTIONS header examples loaded; they are not independently observed merchant responses.");
+  el("offline-results").hidden=true;
+}
+el("sample-headers").addEventListener("click",demoHeaders);
+el("inspect-headers").addEventListener("click",()=>{
+  el("offline-results").hidden=true;
+  try{
+    const report=diagnoseCorsHeaders({
+      challengeText:el("challenge-paste").value,
+      optionsText:el("options-paste").value,
+      origin:origin.value,
+      paidMethod:el("paid-method").value,
+    });
+    el("offline-results").hidden=false;
+    el("offline-summary").textContent=report.browserReadabilityDeclared?
+      "Pasted transcript declares a browser-visible unpaid HTTP 402 price header.":
+      "Pasted transcript contains potential blockers or is not a complete browser-visible 402 quote.";
+    el("offline-fail").replaceChildren();
+    el("offline-warn").replaceChildren();
+    el("offline-pass").replaceChildren();
+    for(const v of report.errors)addResult(el("offline-fail"),v.replaceAll("_"," "));
+    for(const v of report.warnings)addResult(el("offline-warn"),v.replaceAll("_"," "));
+    for(const v of report.passes)addResult(el("offline-pass"),v.replaceAll("_"," "));
+    show("offline-status","Local header inspection complete. These are user-pasted assertions; no network check, settlement verification or wallet signature occurred.");
+  }catch(e){show("offline-status","Cannot interpret pasted public headers: "+String(e?.message||e),true);}
+});
+el("same-owner-sample").addEventListener("click",()=>{
+  url.value="https://vm5-openapi-x402.onrender.com/v1/csv-report";
+  el("probe-consent").checked=false;
+  el("live-results").hidden=true;
+  show("live-status","Same-beneficial-owner VM5 public, unpaid GET endpoint selected. Nothing requested. Authorize a live GET separately.");
+});
+el("live-probe").addEventListener("click",async()=>{
+  el("live-results").hidden=true;
+  if(!el("probe-consent").checked){
+    show("live-status","Explicit authorization is required before any external network request.",true);
+    return;
+  }
+  let verifiedUrl;
+  try{verifiedUrl=validateProbeUrl(url.value);}catch(e){
+    show("live-status",String(e.message||e),true);return;
+  }
+  const button=el("live-probe");
+  if(button.disabled)return;
+  button.disabled=true;
+  const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),9000);
+  try{
+    show("live-status","Sending one unsigned GET from YOUR browser to the authorized public HTTPS URL. No wallet/payment credentials are sent.");
+    const response=await fetch(verifiedUrl,{
+      method:"GET",mode:"cors",credentials:"omit",redirect:"error",cache:"no-store",
+      referrerPolicy:"no-referrer",signal:controller.signal,
+      headers:{"Accept":"application/json,text/plain,*/*"},
+    });
+    const header=response.headers.get("payment-required");
+    const report=summarizeLiveBrowserResult({status:response.status,headerValue:header});
+    el("live-results").hidden=false;
+    el("live-status-code").textContent=String(report.status);
+    el("live-price-readable").textContent=report.headerReadable?"YES":"NO / UNKNOWN";
+    el("live-paid").textContent="NO";
+    show("live-status",report.headerReadable&&response.status===402?
+      "Success: your real browser can read PAYMENT-REQUIRED on a public, unpaid 402. This does NOT verify the payee, paid retry, settlement or delivery.":
+      "An HTTP response was readable, but no v2 price header was readable on a 402. The server may omit it or fail to expose it; compare raw server headers below.",
+      !(report.headerReadable&&response.status===402));
+  }catch(e){
+    el("live-results").hidden=true;
+    show("live-status","Browser fetch failed or timed out. This may be CORS, DNS, redirect, TLS or network failure; JavaScript cannot distinguish those conditions reliably. Compare server-side headers before deciding.",true);
+  }finally{clearTimeout(timeout);button.disabled=false;}
+});
+</script>
+</head>
+<body>
+<nav><div class="wrap">
+<a class="brand" href="../">VM3 <span>PAYMENT / QA</span></a>
+<div class="navlinks"><a href="../">Other free tools</a><a href="x402-402-preflight.html">402 safety guide</a><a href="base-usdc-merchant-ledger.html#buyer-feedback">What do buyers need?</a></div>
+</div></nav>
+<main class="wrap">
+<header class="hero">
+<p class="kicker">Free x402 developer diagnostic · Browser-local · No wallet or payment</p>
+<h1>Your paid API returns <em>402.</em> Can the buyer actually read it?</h1>
+<p class="lead">A seller may return the correct <code>PAYMENT-REQUIRED</code> header while browsers hide it because of CORS. Test an authorized, unsigned <strong>public GET</strong> in your own browser, or diagnose copied 402 and OPTIONS headers privately.</p>
+<p class="warn"><strong>Scope:</strong> The live probe sends one ordinary <strong>GET</strong> from your browser to the exact public HTTPS URL you authorize. The merchant receives your IP and target URL. <strong>Never use it on secrets, private endpoints or a route you do not operate/have permission to test.</strong> No signature, purchase, refund, settle, credential, wallet connection or chain transaction happens here. A passing quote is not proof of seller safety or fulfillment.</p>
+</header>
+<div class="grid">
+<section class="card" aria-labelledby="live-heading" style="margin-top:0">
+<p class="kicker">1 · Real browser test · explicit opt-in</p>
+<h2 id="live-heading">Can this browser read an unpaid GET quote?</h2>
+<label for="public-endpoint">Public HTTPS, GET-only x402 endpoint URL</label>
+<input type="url" id="public-endpoint" autocomplete="off" spellcheck="false" placeholder="https://seller.example.org/public-paid-get">
+<p class="caption">We reject localhost/private/IP-literal endpoints, userinfo, fragments, nonstandard ports and credential-like query keys. Do not paste API keys or signatures even if they have another name.</p>
+<label for="probe-consent" class="check"><input id="probe-consent" type="checkbox"> I operate this URL, or am explicitly authorized to test this public GET. I understand a request will reach the seller and may be logged.</label>
+<div class="btns">
+<button id="live-probe" class="primary" type="button">Send one unpaid browser GET</button>
+<button id="same-owner-sample" type="button">Use our actual same-owner VM5 example (no request yet)</button>
+</div>
+<p id="live-status" role="status" aria-live="polite" class="good status">No live endpoint request yet. This page does not automatically probe the network.</p>
+<div id="live-results" class="stat-grid" hidden>
+<div class="stat"><strong id="live-status-code">—</strong><span>Actual accessible HTTP status</span></div>
+<div class="stat"><strong id="live-price-readable">—</strong><span>PAYMENT-REQUIRED accessible to JavaScript</span></div>
+<div class="stat"><strong id="live-paid">NO</strong><span>Paid transfer/signature attempted</span></div>
+</div>
+<p class="caption">Successful 402 inspection still says nothing about a valid <code>PAYMENT-SIGNATURE</code> retry, facilitator delivery, settlement finality or buyer funds. No payment retry is performed, even with the real same-owner example.</p>
+</section>
+<section class="card alt" aria-labelledby="why-heading" style="margin-top:0">
+<p class="kicker">Practical field problem</p>
+<h2 id="why-heading">The difference between a 402 on curl and a paid browser buyer</h2>
+<ul>
+<li><strong>Origin:</strong> Does the 402 response permit the browser's <code>Origin</code>?</li>
+<li><strong>Expose:</strong> Does it expose <code>PAYMENT-REQUIRED</code> and, on paid completion, <code>PAYMENT-RESPONSE</code>?</li>
+<li><strong>Preflight:</strong> Does a separate <code>OPTIONS</code> respond with 2xx and allow the intended method plus <code>PAYMENT-SIGNATURE, Content-Type</code>?</li>
+<li><strong>Paid delivery:</strong> Not tested here. A quote is not proof that a signed retry worked or that the buyer received the resource.</li>
+</ul>
+<p class="caption">This independently observed problem is discussed in the <a href="https://github.com/x402-foundation/x402/issues/3722">x402 Foundation CORS issue #3722</a>. A separate one-owner <a href="https://github.com/x402-foundation/x402/issues/3722#issuecomment-6288556282">real browser positive-control field report</a> shows a 402 quote and an OPTIONS 204 on our own VM5 API; it is not third-party buying evidence.</p>
+<p class="caption"><strong>Important:</strong> JavaScript cannot directly set its own browser-generated <code>Access-Control-Request-Headers</code> preflight fields or see every server header. The live GET test only checks quote readability, not the separate signed-POST preflight. Paste server-side OPTIONS headers below to inspect those claims offline.</p>
+</section>
+</div>
+<section class="card" aria-labelledby="offline-heading">
+<p class="kicker">2 · Fully offline header comparison · No requests</p>
+<h2 id="offline-heading">Paste your public HTTP 402 and OPTIONS response headers</h2>
+<p class="muted">Use public, unsigned raw header transcripts collected by your own tooling. Copy no bodies, bearer headers, signed tokens, API keys, cookies or private customer fields. We analyze these transcripts only in your browser; they are <strong>user-supplied assertions</strong>, not independently authenticated responses.</p>
+<div class="grid">
+<div>
+<label for="buyer-origin">Browser's target Origin (plain scheme + hostname)</label>
+<input id="buyer-origin" type="text" spellcheck="false" autocomplete="off" placeholder="https://your-buyer.example.org">
+<label for="challenge-paste">Unpaid 402 response HEADERS only (limit 48 KB)</label>
+<textarea id="challenge-paste" spellcheck="false" placeholder="HTTP/2 402&#10;Access-Control-Allow-Origin: https://your-buyer.example.org&#10;Access-Control-Expose-Headers: PAYMENT-REQUIRED,PAYMENT-RESPONSE&#10;PAYMENT-REQUIRED: [public unsigned quote]"></textarea>
+</div>
+<div>
+<label for="paid-method">Method you intend to pay for</label>
+<select id="paid-method"><option value="POST">POST with JSON body</option><option value="GET">GET (browser with payment-signature retry)</option></select>
+<label for="options-paste">OPTIONS preflight response HEADERS, if collected</label>
+<textarea id="options-paste" spellcheck="false" placeholder="HTTP/2 204&#10;Access-Control-Allow-Origin: https://your-buyer.example.org&#10;Access-Control-Allow-Methods: GET,POST,OPTIONS&#10;Access-Control-Allow-Headers: Content-Type,PAYMENT-SIGNATURE"></textarea>
+<p class="caption">For a POST buyer with JSON, both payment-signature and content-type belong in the allow list. If you omit the OPTIONS transcript, the tool marks preflight untested rather than passing it.</p>
+</div>
+</div>
+<div class="btns"><button id="inspect-headers" class="primary" type="button">Diagnose pasted header data locally</button><button id="sample-headers" type="button">Load invented 402 + OPTIONS headers</button></div>
+<p id="offline-status" class="good status" role="status" aria-live="polite">No pasted headers have been analyzed. No background network request is made.</p>
+<div id="offline-results" hidden>
+<h3 id="offline-summary">—</h3>
+<div class="grid">
+<div><h3>Potential blockers</h3><ul id="offline-fail"></ul></div>
+<div><h3>Not independently established / recommendations</h3><ul id="offline-warn"></ul></div>
+</div>
+<h3>Checks claimed by supplied headers</h3><ul id="offline-pass"></ul>
+<p class="warn">This result describes only the exact pasted text and chosen browser origin. It is NOT a real-world merchant security certification, on-chain verification, signed payment success, client testimonial or finished customer QA job.</p>
+</div>
+</section>
+<section class="card" aria-labelledby="scope-heading">
+<p class="kicker">3 · Optional buyer-paid integration QA · Only after your written approval</p>
+<h2 id="scope-heading">Need reproducible evidence for one real paid endpoint?</h2>
+<p>For an authorized merchant, we can quote a small AI-assisted <strong>browser-CORS/HTTP 402 integration smoke report</strong>: a reproducible browser origin, unsigned quote and OPTIONS observations, explicit limitation of signed-payment coverage, and prioritized remediation checklist. Request a <strong>written fixed-price quote</strong> before any paid work. No security certification, real purchase, bug bounty award or previous contracted x402 QA engagement is claimed.</p>
+<div class="btns">
+<a class="btn primary" href="mailto:onecursor1@gmail.com?subject=Paid%20x402%20browser%20402%20CORS%20QA%20scoped%20quote&amp;body=Public%20authorized%20HTTPS%20endpoint%20%28no%20keys%29%3A%0AMy%20browser%20origin%3A%0AExpected%20method%3A%0AObserved%20public%20error%3A%0APlease%20quote%20one%20bounded%20review%20in%20Base%20USDC.%20No%20work%20or%20payment%20is%20authorized%20until%20written%20acceptance.">Request a real paid QA quote ↗</a>
+<a class="btn" href="https://api.soul.mds.markets/v1/soul/vm3-usdc-receipt-qa">Separate 0.75 / 1.50 USDC quote-shape AI services ↗</a>
+<a class="btn" href="base-usdc-merchant-ledger.html#buyer-feedback">Tell us which error actually costs you time ↗</a>
+</div>
+<p class="caption">One genuine beneficial seller across VM1/2/3/5. The platform-linked 0.75/1.50 USDC service is separately priced for unsigned quote-shape review; it is <strong>not</strong> this browser CORS inspection or paid signed-delivery verification. No wallet signature is required to ask for a quote; no buyer contract or payout has been verified for this new page.</p>
+</section>
+</main>
+<footer class="wrap">
+Original x402 developer support by one real beneficial owner · AI assistance disclosed · 2026-10-20 · <a href="x402-402-preflight.html">Free x402 transport guide</a> · <a href="../">Other VM3 services</a>.
+</footer>
+</body>
+</html>
