@@ -79,9 +79,37 @@ function selectColumn(head,aliases,required){
  if(required&&indices.length===0)fail("Missing required timestamp/asset/amount header");
  return indices[0]??null;
 }
+/**
+ * Kraken firstparty ledgers export has a specifically documented schema:
+ * txid/refid are EXCHANGE-LOCAL ledger IDs, time is UTC without timezone,
+ * withdrawals are negative amounts, deposits are positive and other ledger
+ * type rows are NOT safe to assume outgoing/incoming wallet transfers.
+ * This profile must never be inferred from just an arbitrary "txid" header.
+ * Source: https://support.kraken.com/hc/articles/360001169383-how-to-interpret-ledger-history-fields
+ */
+function isKrakenLedger(header) {
+ const names=header.map(normalHeader);
+ return ["txid","refid","time","type","aclass","asset","amount","fee","balance"]
+   .every(key=>names.filter(x=>x===key).length===1);
+}
+function krakenTime(value){
+ const t=value.trim();
+ if(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d{1,6})?$/.test(t)) {
+   // Only the strict, distinctive Kraken ledger header grants documented UTC.
+   // Fractional precision beyond JavaScript milliseconds is truncated for
+   // *candidate* time-window matching, not for financial/legal finality.
+   const trimmedMs=t.replace(/(\.\d{3})\d{1,3}$/, "$1");
+   return safeDate(trimmedMs.replace(" ","T")+"Z");
+ }
+ return safeDate(t); // Already explicit UTC or +/- offset.
+}
 export function normalizedEvents(csv,kind){
  if(!["withdrawals","receipts"].includes(kind))fail("Expected explicit withdrawals or receipts CSV direction");
  const data=parseCsv(csv),header=data[0];
+ const krakenLedger=isKrakenLedger(header);
+ const headerNames=header.map(normalHeader);
+ const ledgerTypeColumn=krakenLedger?headerNames.indexOf("type"):null;
+ const internalIdColumn=krakenLedger?headerNames.indexOf("txid"):null;
  const col={
   time:selectColumn(header,HEADER_ALIASES.time,true),
   asset:selectColumn(header,HEADER_ALIASES.asset,true),
@@ -89,15 +117,31 @@ export function normalizedEvents(csv,kind){
   hash:selectColumn(header,HEADER_ALIASES.hash,false),
   fee:selectColumn(header,HEADER_ALIASES.fee,false)
  };
- const seen=new Map(), events=[], issues=[];
+ const seen=new Map(), events=[], issues=[], ignoredRows=[];
  for(let i=1;i<data.length;i++){
   const rec=data[i],row=i+1;const ticker=rec[col.asset].trim().toUpperCase();
-  const timestamp=safeDate(rec[col.time].trim());
-  const amount=parseMoney(rec[col.amount].trim());
+  if(krakenLedger){
+   const movement=rec[ledgerTypeColumn].trim().toLowerCase();
+   if((kind==="withdrawals"&&movement!=="withdrawal")||
+      (kind==="receipts"&&movement!=="deposit")){
+     ignoredRows.push(row); // Trade/stake/etc are NOT wallet cashflows.
+     continue;
+   }
+  }
+  const timestamp=krakenLedger?krakenTime(rec[col.time]):safeDate(rec[col.time].trim());
+  const originalAmount=rec[col.amount].trim();
+  const krakenSignOK=!krakenLedger||
+    (kind==="withdrawals"&&originalAmount.startsWith("-"))||
+    (kind==="receipts"&&!originalAmount.startsWith("-"));
+  const amount=parseMoney(krakenLedger&&kind==="withdrawals"&&originalAmount.startsWith("-")
+    ?originalAmount.slice(1):originalAmount);
   const fee=col.fee!==null?parseFee(rec[col.fee].trim()):0n;
-  const givenHash=col.hash!==null?rec[col.hash].trim().toLowerCase():"";
+  // Kraken ledgers txid is NOT a blockchain transaction hash.
+  const givenHash=krakenLedger?"":col.hash!==null?rec[col.hash].trim().toLowerCase():"";
   const hash=/^0x[0-9a-f]{64}$/.test(givenHash)?givenHash:"";
+  const dedupeId=krakenLedger?rec[internalIdColumn].trim():"";
   const invalid=[];
+  if(!krakenSignOK)invalid.push("KRAKEN_AMOUNT_DIRECTION_MISMATCH");
   if(!/^[A-Z0-9._-]{2,22}$/.test(ticker))invalid.push("ASSET_LABEL_UNSUPPORTED");
   if(timestamp===null)invalid.push("TIME_NEEDS_ISO_OFFSET");
   if(amount===null)invalid.push("AMOUNT_INVALID");
@@ -107,7 +151,7 @@ export function normalizedEvents(csv,kind){
    issues.push({side:kind,row,codes:invalid});
    continue;
   }
-  const key=[ticker,timestamp,amount.toString(),hash,fee.toString()].join("|");
+  const key=[ticker,timestamp,amount.toString(),hash,fee.toString(),dedupeId].join("|");
   if(seen.has(key)){
    issues.push({side:kind,row,codes:["DUPLICATE_EXACT_ROW"],firstRow:seen.get(key)});
    continue;
@@ -115,7 +159,10 @@ export function normalizedEvents(csv,kind){
   seen.set(key,row);
   events.push({side:kind,row,asset:ticker,ms:timestamp,amount,fee,hash});
  }
- return {events,issues,inputRows:data.length-1,acceptedRows:events.length};
+ return {
+  events,issues,ignoredRows,inputRows:data.length-1,acceptedRows:events.length,
+  sourceFormat:krakenLedger?"KRAKEN_OFFICIAL_LEDGER_INTERNAL_IDS_UTC_ASSUMED":"GENERIC_EXPLICIT_TIMEZONE"
+ };
 }
 function optionsFor(w,r,minutes){
  if(w.asset!==r.asset)return null;
@@ -174,8 +221,12 @@ export function reconcilePairs(withdrawalsCsv,receiptsCsv,{windowMinutes=DEFAULT
  }
  return {
   reportType:"ORIGINAL_LOCAL_PRIVATE_CRYPTO_TRANSFER_CANDIDATES_NOT_TAX_ADVICE",
-  input:{withdrawalRows:w.inputRows,receiptRows:r.inputRows,windowMinutes},
+  input:{
+   withdrawalRows:w.inputRows,receiptRows:r.inputRows,windowMinutes,
+   withdrawalSourceFormat:w.sourceFormat,receiptSourceFormat:r.sourceFormat
+  },
   counts:{candidatePairs:pairs.length,ambiguousOutgoingRows:ambiguous.length,
+    excludedNonTransferRows:w.ignoredRows.length+r.ignoredRows.length,
     unmatchedOutgoing:w.events.length-usedW.size,unmatchedIncoming:r.events.length-usedR.size,
     invalidOrDuplicateRows:w.issues.length+r.issues.length,amountDisagreements:disagreements.length},
   pairs,ambiguous,amountDisagreements:disagreements,
@@ -186,6 +237,9 @@ export function reconcilePairs(withdrawalsCsv,receiptsCsv,{windowMinutes=DEFAULT
    "No onchain verification, no address ownership or identity validation.",
    "A plausible send/receive data pair cannot be assumed to be your own non-taxable transfer.",
    "Fees, exchange internal IDs, multiple outputs, bridging, swaps, rounding, changing token denominations and missing sources can invalidate matches.",
+   "Only a positively identified Kraken official ledger export uses its documented timezone-less UTC interpretation; Kraken ledger txid is INTERNAL, never a blockchain transaction hash.",
+   "Kraken trade/stake/reward/internal transfer types are excluded. Negative withdrawal / positive deposit conventions and fee semantics remain user-review items.",
+   "BTC/XBT, token wrapping, token names across exchanges and multiple chain-specific transfer IDs are NOT silently converted.",
    "No tax calculations, cost-basis carryover, legal classification, filing advice or guarantee.",
    "Do not use this report alone for account reconciliation, invoicing, payment finality or tax returns.",
    "All source rows stay in this browser; report contains CSV row numbers and issue codes, not raw wallet or customer data."
@@ -195,3 +249,18 @@ export function reconcilePairs(withdrawalsCsv,receiptsCsv,{windowMinutes=DEFAULT
 }
 export const EXAMPLE_WITHDRAWALS="timestamp,asset,amount,txhash,fee\n2026-10-12T10:10:00Z,USDC,10.005,0x"+ "1".repeat(64) +",0.005\n2026-10-12T11:10:00Z,BTC,0.15,,0\n2026-10-12T12:10:00Z,USDC,20,,0";
 export const EXAMPLE_RECEIPTS="timestamp,asset,amount,txhash\n2026-10-12T10:10:04Z,USDC,10,0x"+ "1".repeat(64)+"\n2026-10-12T11:12:00Z,BTC,0.15,\n2026-10-12T14:40:00Z,USDC,20,";
+
+/** Invented Kraken-style ledger schema demonstration (NO actual Kraken users/records).
+ * Do not treat the txid column as an onchain hash; Kraken official docs say
+ * ledger txid identifies the ledger record, not an EVM transfer.
+ */
+export const EXAMPLE_KRAKEN_WITHDRAWALS=[
+ "txid,refid,time,type,subtype,aclass,asset,amount,fee,balance",
+ "L-FAKE-OUT-101,R-FAKE-101,2026-10-12 10:10:00,withdrawal,,currency,USDC,-10.005,0.005,89.990",
+ "L-FAKE-TRADE-102,R-FAKE-102,2026-10-12 10:10:10,trade,,currency,USDC,1,0,90.990"
+].join("\n");
+export const EXAMPLE_KRAKEN_RECEIPTS=[
+ "timestamp,asset,amount,txhash",
+ "2026-10-12T10:11:00Z,USDC,10,",
+ "2026-10-12T12:11:00Z,BTC,0.20,"
+].join("\n");

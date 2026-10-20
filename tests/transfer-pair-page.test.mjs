@@ -15,7 +15,7 @@ test("privacy and no-tax-claims are explicit",()=>{
  assert.match(h,/no payment or feedback is required/i);
 });
 test("source is original and links to reproducible tests",()=>{
- assert.match(h,/import \{reconcilePairs,EXAMPLE_WITHDRAWALS,EXAMPLE_RECEIPTS\} from "\.\.\/transfer-pair-local\.mjs"/);
+ assert.match(h,/import \{reconcilePairs,EXAMPLE_WITHDRAWALS,EXAMPLE_RECEIPTS,EXAMPLE_KRAKEN_WITHDRAWALS,EXAMPLE_KRAKEN_RECEIPTS\} from "\.\.\/transfer-pair-local\.mjs"/);
  assert.ok(h.includes("tests/transfer-pair-local.test.mjs"));
 });
 test("email research asks for no identifying information and accepts $0 demand",()=>{
@@ -36,4 +36,17 @@ test("fully responsive with accessible status and disabled result until evaluate
 test("canonical route available to independent visitors",()=>{
  assert.ok(h.includes('rel="canonical"'));
  assert.ok(h.includes("guides/crypto-transfer-csv-pair-auditor.html"));
+});
+
+test("Kraken preview has an explicit invented sample and warns ledger IDs are not chain hashes",()=>{
+ assert.match(h,/id="kraken"/);
+ assert.match(h,/Kraken ledger <code>txid<\/code> is an <em>internal record ID/);
+ assert.match(h,/Kraken's official ledger field reference/);
+ assert.match(h,/excluded non-transfer ledger rows/);
+});
+
+test("one genuine existing public feedback issue crosslink does not invent new respondents",()=>{
+ assert.match(h,/github\.com\/livastic-vm3-primary-tmp-260920\/defi-payment-proof-qa\/issues\/1/);
+ assert.match(h,/all comments are public/);
+ assert.match(h,/No actual user respondents/);
 });

@@ -29,13 +29,14 @@ code{background:#0e2235;border-radius:4px;padding:2px 4px;font:13px ui-monospace
 <p class="eyebrow">Based on recurring crypto-user CSV reconciliation complaints · Free & private</p>
 <h1>Did a wallet transfer turn into a mysterious “sale”?</h1>
 <p class="lead">Put withdrawal and deposit rows side-by-side. This browser-local checker finds plausible same-asset transaction pairs, duplicate rows, competing matches, missing transfers and amount disagreements. It does <strong>not</strong> decide whether a transfer was yours or taxable.</p>
-<p class="row"><button type="button" id="sample">Load invented example</button> <a href="#tool">Jump to CSV comparison ↓</a></p>
+<p class="row"><button type="button" id="sample">Load invented example</button> <button type="button" class="alt" id="kraken">Load invented Kraken ledger example</button> <a href="#tool">Jump to CSV comparison ↓</a></p>
 <div class="grid" id="tool">
 <section class="card"><h2>Outgoing CSV</h2><p class="small">Enter ONLY outgoing transfers from an account you control, not arbitrary trade rows. UTC time needs a timezone.</p><label for="out">Withdrawals CSV</label><textarea id="out" spellcheck="false" autocomplete="off" aria-label="Outgoing CSV rows to compare locally" placeholder="timestamp,asset,amount,txhash,fee&#10;2026-10-12T10:10:00Z,USDC,10.005,,0.005"></textarea></section>
 <section class="card"><h2>Incoming CSV</h2><p class="small">Enter ONLY incoming transfers. Your source fields stay inside this page.</p><label for="inc">Receipts CSV</label><textarea id="inc" spellcheck="false" autocomplete="off" aria-label="Incoming CSV rows to compare locally" placeholder="timestamp,asset,amount,txhash&#10;2026-10-12T10:11:00Z,USDC,10,"></textarea></section>
 </div>
 <section class="card">
 <h2>Compare privately</h2>
+<p class="small"><strong>Kraken Ledger CSV support (beta):</strong> For the strictly identified official Kraken <code>txid,refid,time,type,subtype,aclass,asset,amount,fee,balance</code> export, the source's timezone-less timestamp is interpreted as UTC according to <a href="https://support.kraken.com/hc/articles/360001169383-how-to-interpret-ledger-history-fields">Kraken's official ledger field reference</a>. Withdrawals (negative) and deposits (positive) are separated by the type field; trades, staking and internal ledger movements are excluded and counted. Kraken ledger <code>txid</code> is an <em>internal record ID, NOT an onchain transaction hash</em>, so it is only used to recognize duplicates and NEVER trusted as chain proof. Other unknown CSVs still require timestamps with an explicit timezone. No alias between BTC/XBT or other currencies is assumed.</p>
 <p class="small">Required columns: timestamp,asset,amount. Optional: txhash,fee. Supported aliases include Date(UTC), Coin, Quantity Transacted and Network Fee. Each timestamp requires Z or ±hh:mm timezone. 1000 rows / 128 KiB maximum per file. No RPC, cookies, wallet, sign-in, tracking, analytics or upload.</p>
 <p class="row"><label for="window">Time window (minutes)</label><input id="window" aria-label="Matching window minutes" type="number" min="1" max="1440" value="90" step="1"><button id="run" type="button">Find candidate pairs →</button><button id="clear" class="alt" type="button">Clear</button><button id="download" class="alt" type="button" disabled>Download row-only report</button></p>
 </section>
@@ -48,6 +49,7 @@ code{background:#0e2235;border-radius:4px;padding:2px 4px;font:13px ui-monospace
 <h2>What would you actually pay to fix?</h2>
 <p>We are interviewing users about broken exchange imports and USDC invoice/receipt mismatches. Feedback is valuable even if your realistic willingness to pay is <strong>$0</strong>. Send only an <strong>invented or anonymized</strong> example, hours lost and whether $0 / $9 / $29 / $99 would be justified to you.</p>
 <p class="row"><a class="button" href="mailto:onecursor1@gmail.com?subject=Crypto%20CSV%20demand%20feedback%20-%20no%20private%20data&amp;body=Problem%20without%20wallet%20address%2C%20tx%20ID%20or%20private%20CSV%3A%0AHours%20lost%3A%0APrice%20I%20would%20ACTUALLY%20pay%20%28%240%2F%249%2F%2429%2F%2499%29%3A%0AOne%20missing%20feature%3A">Send optional research feedback ↗</a></p>
+<p class="small">Prefer a developer discussion rather than email? The <a href="https://github.com/livastic-vm3-primary-tmp-260920/defi-payment-proof-qa/issues/1">existing public GitHub user-feedback issue</a> welcomes honest answers (including free-only users), requires a normal GitHub sign-in, and all comments are public. Do not post private data there; the same one-owner team reviews it.</p>
 <p class="small">Emailing us may disclose your sender email address. Do not include private wallet details, tax returns, transaction hashes, customer data, KYC documents, login credentials or keys. No payment or feedback is required to use this tool. We have no evidence of paid users of this specific new tool yet. No actual user respondents or paid customers have been independently verified.</p>
 <h2>Need more than a free preview?</h2>
 <p>Indicative <strong>15 native Base USDC</strong> for a small (<strong>up to five</strong>) explicitly authorized, redacted source-linked discrepancy memo, subject to separately agreed lawful scope, acceptance, payee verification and payment. No tax return preparation, investment advice, address ownership certification or transaction recovery. Do not prepay an unverified wallet.</p>
@@ -58,17 +60,23 @@ code{background:#0e2235;border-radius:4px;padding:2px 4px;font:13px ui-monospace
 <footer>One Cursor · Original privacy-first crypto bookkeeping research · 2026-10-20 · No tax advice, wallet signing, past paid orders or independent chain verification implied.</footer>
 </main>
 <script type="module">
-import {reconcilePairs,EXAMPLE_WITHDRAWALS,EXAMPLE_RECEIPTS} from "../transfer-pair-local.mjs";
+import {reconcilePairs,EXAMPLE_WITHDRAWALS,EXAMPLE_RECEIPTS,EXAMPLE_KRAKEN_WITHDRAWALS,EXAMPLE_KRAKEN_RECEIPTS} from "../transfer-pair-local.mjs";
 const out=document.getElementById("out"),inc=document.getElementById("inc"),sum=document.getElementById("summary"),items=document.getElementById("details"),dl=document.getElementById("download");let report=null;
 const line=text=>{const li=document.createElement("li");li.textContent=text;items.append(li);};
 document.getElementById("sample").addEventListener("click",()=>{out.value=EXAMPLE_WITHDRAWALS;inc.value=EXAMPLE_RECEIPTS;items.replaceChildren();report=null;dl.disabled=true;sum.textContent="Invented-only sample loaded. No actual crypto was sent or read.";sum.dataset.warning="false";});
+document.getElementById("kraken").addEventListener("click",()=>{
+ out.value=EXAMPLE_KRAKEN_WITHDRAWALS;inc.value=EXAMPLE_KRAKEN_RECEIPTS;
+ items.replaceChildren();report=null;dl.disabled=true;
+ sum.textContent="Invented Kraken Ledger CSV example loaded. No real Kraken records were accessed; internal ledger IDs are not chain tx hashes.";
+ sum.dataset.warning="false";
+});
 document.getElementById("clear").addEventListener("click",()=>{out.value="";inc.value="";items.replaceChildren();report=null;dl.disabled=true;sum.textContent="Both CSV inputs cleared. Nothing was uploaded or stored.";sum.dataset.warning="false";});
 document.getElementById("run").addEventListener("click",()=>{
  items.replaceChildren();report=null;dl.disabled=true;
  try{
   const r=reconcilePairs(out.value,inc.value,{windowMinutes:Number(document.getElementById("window").value)});report=r;dl.disabled=false;
   const c=r.counts;
-  sum.textContent=c.candidatePairs+" possible pairs, "+c.ambiguousOutgoingRows+" ambiguous sends, "+c.amountDisagreements+" amount conflicts, "+c.unmatchedOutgoing+" unmatched sends, "+c.unmatchedIncoming+" unmatched deposits and "+c.invalidOrDuplicateRows+" input issues. NO pair is proven an owned/non-taxable transfer.";
+  sum.textContent=c.candidatePairs+" possible pairs, "+c.ambiguousOutgoingRows+" ambiguous sends, "+c.amountDisagreements+" amount conflicts, "+c.unmatchedOutgoing+" unmatched sends, "+c.unmatchedIncoming+" unmatched deposits, "+c.invalidOrDuplicateRows+" invalid/duplicate rows and "+c.excludedNonTransferRows+" excluded non-transfer ledger rows. Sources: "+r.input.withdrawalSourceFormat+" / "+r.input.receiptSourceFormat+". NO pair is proven an owned/non-taxable transfer.";
   sum.dataset.warning=String(c.ambiguousOutgoingRows+c.amountDisagreements+c.unmatchedOutgoing+c.invalidOrDuplicateRows>0);
   for(const x of r.pairs)line("Withdrawal row "+x.fromRow+" vs receipt row "+x.toRow+" ("+x.asset+"): "+x.matchKind+"; clock delta "+x.clockDifferenceMinutes+" minutes. Unverified candidate.");
   for(const x of r.ambiguous)line("Withdrawal row "+x.fromRow+" has multiple plausible receipt rows "+x.competingReceiptRows.join(", ")+". Not auto-matched.");
