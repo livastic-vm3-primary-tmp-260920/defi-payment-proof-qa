@@ -49,3 +49,9 @@ Default = quote-only, no key/wallet/signature/gas/payment. Optional real payment
 ## Free private CSV checker for your own input (no upload or payment)
 - https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/guides/csv-free-local-checker.html
 - This page runs client-side structural checks with no user data sent and no wallet checkout. Paid reports are a separate, explicitly independently purchased VM5 x402 API for 0.005 native Circle USDC on Base; an HTTP 402 is NOT a sale.
+
+## Original public website QA fixed-price pilot (new independent seller offer, 2026-10-20)
+- Buyer-facing published product: https://livastic-vm3-primary-tmp-260920.github.io/defi-payment-proof-qa/services/public-web-qa-19-usdc.html
+- Price: indicative 19 native Circle USDC on Base for up to five explicitly authorized public HTTPS pages from one origin, after written paid contract/acceptance. Email request is NOT a purchase.
+- Real original proof: https://github.com/livastic-vm3-primary-tmp-260920/public-web-qa-smoke-evidence-20261020 (19/19 offline tests; five original owner-controlled demo pages HTTP200). No paid customer order or 3rd-party-client experience asserted.
+- Deliverables: bounded read-only HTTP/HTML structural smoke report, reproduction evidence, suggested fixes, one agreed retest. No credentials, payments, production penetration test, human screen reader/WCAG certification, or real phone browser promised.
