@@ -251,12 +251,30 @@ el("live-probe").addEventListener("click",async()=>{
 <p class="warn">This result describes only the exact pasted text and chosen browser origin. It is NOT a real-world merchant security certification, on-chain verification, signed payment success, client testimonial or finished customer QA job.</p>
 </div>
 </section>
+<section class="card alt" id="actual-external-repro" aria-labelledby="actual-repro-heading">
+<p class="kicker">Real independently observed third-party issue · not a paid client case</p>
+<h2 id="actual-repro-heading">Example: a live x402 seller returns 402, but a browser cannot read the quote</h2>
+<p>An independently operated public paid API, <a href="https://pqs.onchainintel.net/">PQS by OnChainIntel</a>, is listed in a public x402 discovery catalog. On <strong>October 20, 2026</strong> I tested only its public <code>https://pqs.onchainintel.net/api/preflight</code> endpoint. This is <strong>not</strong> a contracted audit, an authorized penetration test or an endorsement from PQS.</p>
+<ul>
+<li>An unsigned HTTP GET returned <code>402</code> and a <code>PAYMENT-REQUIRED</code> header, but lacked <code>Access-Control-Allow-Origin</code> and <code>Access-Control-Expose-Headers</code> for the independent browser origin.</li>
+<li>In real headless Chrome, a credentialless cross-origin <code>fetch</code> was blocked with <code>TypeError: Failed to fetch</code>; the console identified the missing <code>Access-Control-Allow-Origin</code>.</li>
+<li>An unsigned <code>OPTIONS</code> declaring the intended <code>POST</code> and <code>content-type,payment-signature</code> returned <code>204</code> with none of the required CORS allow-origin/method/header response fields.</li>
+</ul>
+<p>Repro steps and a specific acceptance-test proposal were <a href="https://github.com/OnChainAIIntel/x402-pqs/issues/1">submitted directly to the real upstream operator (issue #1)</a>. <strong>The operator has not commissioned us, confirmed browser support, hired us or paid us.</strong> If their API is server-to-server-only, browser integration may be intentionally unsupported. This observation concerns only a publicly accessible unsigned request, never wallet or customer data.</p>
+<p class="caption">This is a concrete example of what one bounded smoke test can reveal, rather than a claim that a test proves payment settlement or security. Our separate same-beneficial-owner VM5 x402 API passed this narrow unsigned 402+OPTIONS check. Neither report exercises the paid signed retry.</p>
+</section>
 <section class="card" aria-labelledby="scope-heading">
-<p class="kicker">3 · Optional buyer-paid integration QA · Only after your written approval</p>
-<h2 id="scope-heading">Need reproducible evidence for one real paid endpoint?</h2>
-<p>For an authorized merchant, we can quote a small AI-assisted <strong>browser-CORS/HTTP 402 integration smoke report</strong>: a reproducible browser origin, unsigned quote and OPTIONS observations, explicit limitation of signed-payment coverage, and prioritized remediation checklist. Request a <strong>written fixed-price quote</strong> before any paid work. No security certification, real purchase, bug bounty award or previous contracted x402 QA engagement is claimed.</p>
+<p class="kicker">3 · Buyer-approved fixed-scope QA · Not an instant checkout</p>
+<h2 id="scope-heading">15 native Base USDC per one authorized endpoint</h2>
+<p>Need a reliable technical diagnosis instead of an ambiguous “does x402 work?” report? This optional <strong>15 USDC fixed-scope integration smoke QA pilot</strong> covers <strong>one buyer-owned/explicitly authorized public HTTPS x402 endpoint and one stated browser Origin</strong>. The final commercial scope, the exact chain/asset/recipient and the delivery date are agreed in writing <strong>before work or any payment</strong>.</p>
+<ul>
+<li><strong>Deliverable:</strong> a reproducible small browser + HTTP 402 / OPTIONS evidence matrix with a readable-price check, expected method, missing exposed or allowed headers, browser error class, source-linked observations and a prioritized configuration checklist.</li>
+<li><strong>Acceptance:</strong> buyer receives an original written report and sanitized reproduction commands, plus <strong>one no-cost read-only retest</strong> of the same endpoint after a configuration change if mutually scheduled.</li>
+<li><strong>Excluded:</strong> production secret access, wallet signing, buyer-funded trial payment, facilitator settlement, Ethereum security audit, penetration testing, guaranteed client conversion, and chain or invoice certification. We do not infer paid settlement from an HTTP 402.</li>
+</ul>
+<p class="caption">This is a <strong>request to agree a contract</strong>, not authorization to charge. Buyers should provide no keys, cookies, private financial records or EIP-3009 signatures. An actual purchase requires separate written acceptance; if no agreement is reached the free tool remains available at 0 USDC. No paying buyer of this pilot is claimed.</p>
 <div class="btns">
-<a class="btn primary" href="mailto:onecursor1@gmail.com?subject=Paid%20x402%20browser%20402%20CORS%20QA%20scoped%20quote&amp;body=Public%20authorized%20HTTPS%20endpoint%20%28no%20keys%29%3A%0AMy%20browser%20origin%3A%0AExpected%20method%3A%0AObserved%20public%20error%3A%0APlease%20quote%20one%20bounded%20review%20in%20Base%20USDC.%20No%20work%20or%20payment%20is%20authorized%20until%20written%20acceptance.">Request a real paid QA quote ↗</a>
+<a class="btn primary" href="mailto:onecursor1@gmail.com?subject=15%20Base%20USDC%20x402%20Browser%20CORS%20QA%20Pilot%20%E2%80%94%20Scope%20Request&amp;body=I%20operate%20or%20am%20authorized%20to%20test%20this%20PUBLIC%20HTTPS%20endpoint%3A%0AOne%20browser%20Origin%3A%0AExpected%20paid%20method%20GET%20or%20POST%3A%0APublic%20error%20description%20(no%20credentials)%3A%0ARequested%20acceptance%20conditions%3A%0AProposed%20price%3A%2015%20USDC%20on%20Base%3B%20confirm%20written%20scope%2C%20payee%2C%20token%2C%20timeline%20and%20agreement%20before%20work%20or%20payment.%0ANo%20secrets%20or%20wallet%20signature%20enclosed.">Request the 15 USDC fixed-scope pilot ↗</a>
 <a class="btn" href="https://api.soul.mds.markets/v1/soul/vm3-usdc-receipt-qa">Separate 0.75 / 1.50 USDC quote-shape AI services ↗</a>
 <a class="btn" href="base-usdc-merchant-ledger.html#buyer-feedback">Tell us which error actually costs you time ↗</a>
 </div>

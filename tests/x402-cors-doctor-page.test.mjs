@@ -46,7 +46,7 @@ test("public page has no inline analytics, forms, iframe, third-party scripts or
   assert.match(page,/no background network request is made/i);
 });
 test("safe price request remains a manual quote; no phantom jobs or cash",()=>{
-  assert.match(page,/Request a real paid QA quote/);
+  assert.match(page,/Request the 15 USDC fixed-scope pilot/);
   assert.match(page,/Separate 0\.75 \/ 1\.50 USDC quote-shape AI services/);
   assert.match(page,/No wallet signature is required to ask for a quote/);
   assert.match(page,/no buyer contract or payout has been verified/i);
@@ -62,4 +62,30 @@ test("developer can paste public 402 and OPTIONS without signing or RPC",()=>{
     "live-status","live-price-readable"])assert.ok(page.includes('id="'+id+'"'),"Missing "+id);
   assert.match(page,/user-supplied assertions/);
   assert.match(page,/not independently authenticated responses/);
+});
+
+test("third-party PQS reproducibility is real and explicitly not a client testimonial",()=>{
+  assert.match(page,/id="actual-external-repro"/);
+  assert.match(page,/https:\/\/github\.com\/OnChainAIIntel\/x402-pqs\/issues\/1/);
+  assert.match(page,/pqs\.onchainintel\.net\/api\/preflight/);
+  assert.match(page,/TypeError: Failed to fetch/);
+  assert.match(page,/Access-Control-Allow-Origin/);
+  assert.match(page,/No wallet signature is required to ask for a quote/);
+  assert.match(page,/operator has not commissioned us, confirmed browser support, hired us or paid us/);
+  assert.match(page,/browser integration may be intentionally unsupported/);
+});
+test("concrete fixed 15 USDC integration QA offer requires written independent buyer acceptance",()=>{
+  assert.match(page,/15 native Base USDC per one authorized endpoint/);
+  assert.match(page,/one buyer-owned\/explicitly authorized public HTTPS x402 endpoint and one stated browser Origin/);
+  assert.match(page,/acceptance/i);
+  assert.match(page,/one no-cost read-only retest/);
+  assert.match(page,/before work or any payment/);
+  assert.match(page,/guaranteed client conversion/);
+  assert.match(page,/No paying buyer of this pilot is claimed/);
+  assert.match(page,/subject=15%20Base%20USDC%20x402/);
+});
+test("priced consulting never changes the free diagnostic or auto-charges the customer",()=>{
+  assert.match(page,/"isAccessibleForFree":true/);
+  assert.match(page,/if no agreement is reached the free tool remains available at 0 USDC/i);
+  assert.doesNotMatch(page,/window\.ethereum|ethereum\.request|sendTransaction|<iframe|<script\s+src=/i);
 });
