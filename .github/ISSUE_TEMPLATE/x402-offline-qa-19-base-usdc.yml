@@ -1,0 +1,85 @@
+name: "x402 offline QA — 19 Base USDC buyer inquiry"
+description: "Nonbinding public buyer inquiry for one authorized x402 API/SDK issue; no payment or private data"
+title: "[Buyer inquiry] x402 static-only QA — "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Public inquiry — NOT an order, invoice or payment
+        This GitHub issue is PUBLIC. Do not post real HTTP Archive (HAR) files,
+        passwords, authentication or API tokens, cookies, customer or personal data,
+        private endpoint URLs, wallets' recovery material, PAYMENT-SIGNATURE,
+        signed payment payloads, private contracts or proprietary source files.
+
+        One human-owned AI-assisted seller offers an optional **19 official native
+        Circle USDC on Base mainnet** static x402 QA report for up to **two
+        sponsor-supplied, sanitized, nonsecret static 402/OPTIONS/OpenAPI fixture
+        sets**, at most **six agreed offline checks**, one Markdown and one
+        JSON findings file, and one bounded factual correction round. This is
+        **not** a live endpoint probe, production deployment, wallet action,
+        independent settlement verification or security certification.
+
+        This public issue is only an expression of interest. Work, delivery,
+        invoicing and any buyer-authorized payment can begin only after an
+        authentic independent buyer and the seller mutually approve a written
+        paid scope, allowed AI work, exact network/asset/owner receiving address,
+        schedule, rights, acceptance, cancellation/refund and positive economics.
+        Buyer silence, issue creation and checkboxes alone are NEVER acceptance.
+        The free published diagnostic remains free:
+        https://dev.to/livasticvm3primarytmp260920/x402-http-402-works-but-the-browser-payment-retry-fails-test-the-actual-client-headers-4ikb
+
+  - type: dropdown
+    id: paid_tier
+    attributes:
+      label: "What would you consider buying?"
+      description: "Nonbinding interest, not a commitment to pay."
+      options:
+        - "19 native Circle Base USDC — up to 2 safe static fixture sets"
+        - "5 native Circle Base USDC — one sanitized symptom only"
+        - "Not yet: question about scope or whether this would be useful"
+    validations:
+      required: true
+
+  - type: input
+    id: public_context
+    attributes:
+      label: "Public x402 library, SDK version or documentation URL"
+      description: "Official or publicly disclosed source only. No private API URLs."
+      placeholder: "e.g. SDK name/version or a public project documentation page"
+    validations:
+      required: true
+
+  - type: textarea
+    id: sanitized_problem
+    attributes:
+      label: "One sanitized symptom, desired outcome and static fixture type"
+      description: "Describe in general terms; NO raw HAR, tokens, signed payment data, or private API details."
+      placeholder: |
+        Example only: Browser CORS preflight rejects a documented request header
+        before an x402 retry. We control our own public app, use SDK vX,
+        and can provide synthetic static OPTIONS/402 headers under a signed SOW.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: purchase_authority
+    attributes:
+      label: "Are you considering this for a real independently funded business task?"
+      options:
+        - "Yes — I am authorized to discuss a company/team budget (no commitment yet)"
+        - "Maybe — budget and authority need checking before any paid proposal"
+        - "No — technical question / free product feedback only"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: safety_ack
+    attributes:
+      label: "Public input, authorization, AI disclosure and contract boundaries"
+      options:
+        - label: "I will only share PUBLIC, redacted and nonsecret details that I have authority to disclose."
+          required: true
+        - label: "I understand this PUBLIC GitHub issue is not a contract or payment, and there is no work until written terms and legal/AI eligibility are agreed."
+          required: true
+        - label: "I understand that any later work is AI-assisted for one human economic owner and is offline-only, not a live paid-request or wallet-settlement audit."
+          required: true
